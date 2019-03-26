@@ -1,0 +1,23 @@
+plugins {
+    id "java"
+    id "application"
+    id "eclipse"
+    id "com.palantir.docker" version "0.21.0"
+    id "com.palantir.docker-run" version "0.21.0"
+}
+
+mainClassName = "com.github.victorcombalweiss.datapuppy.Main"
+def dockerImageName = "datapuppy"
+
+docker {
+    name dockerImageName
+    files tasks.installDist.outputs
+}
+
+dockerRun {
+    name dockerImageName
+    image dockerImageName
+    daemonize false
+}
+
+tasks.dockerRun.dependsOn "docker"
