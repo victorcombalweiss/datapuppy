@@ -1,0 +1,7 @@
+server:
+  requestLog:
+    appenders:
+      - type: console
+      - type: file
+        currentLogFilename: ${ACCESS_LOG_FILE_PATH}
+        archive: false

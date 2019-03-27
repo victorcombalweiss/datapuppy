@@ -7,6 +7,18 @@ plugins {
 }
 
 mainClassName = "com.github.victorcombalweiss.datapuppy.Main"
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    compile group: "io.dropwizard", name: "dropwizard-core", version: "$dropwizardVersion"
+    compile group: "io.dropwizard", name: "dropwizard-assets", version: "$dropwizardVersion"
+}
+
+
 def dockerImageName = "datapuppy"
 
 docker {
@@ -18,6 +30,7 @@ dockerRun {
     name dockerImageName
     image dockerImageName
     daemonize false
+    ports '8080:8080'
 }
 
 tasks.dockerRun.dependsOn "docker"
