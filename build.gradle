@@ -16,6 +16,7 @@ repositories {
 dependencies {
     compile group: "io.dropwizard", name: "dropwizard-core", version: "$dropwizardVersion"
     compile group: "io.dropwizard", name: "dropwizard-assets", version: "$dropwizardVersion"
+    compile group: "commons-io", name: "commons-io", version: "2.4"
 }
 
 
