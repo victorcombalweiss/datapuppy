@@ -17,6 +17,7 @@ dependencies {
     compile group: "io.dropwizard", name: "dropwizard-core", version: "$dropwizardVersion"
     compile group: "io.dropwizard", name: "dropwizard-assets", version: "$dropwizardVersion"
     compile group: "commons-io", name: "commons-io", version: "2.4"
+    compile group: "com.github.pcj", name: "google-options", version: "1.0.0"
 }
 
 

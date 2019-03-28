@@ -7,6 +7,12 @@ import com.github.victorcombalweiss.datapuppy.agent.model.Alert;
 
 class Alerter {
 
+    private final int trafficThreshold;
+
+    public Alerter(int trafficThreshold) {
+        this.trafficThreshold = trafficThreshold;
+    }
+
     void ingestLog(String requestLog, Date forDate) {
         // Not doing anything at the moment
     }

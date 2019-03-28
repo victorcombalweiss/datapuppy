@@ -19,15 +19,23 @@ public class Agent {
 
     public static void main(String[] args) {
 
-        if (args == null || args.length < 1) {
-            logger.error("Usage: <command> ACCESS_LOG_FILE_PATH");
+        if (args == null || args.length < 2) {
+            logger.error("Usage: <command> ACCESS_LOG_FILE_PATH TRAFFIC_THRESHOLD");
+            System.exit(1);
+        }
+        int trafficThreshold = 0;
+        try {
+            trafficThreshold = Integer.parseInt(args[1]);
+        }
+        catch (NumberFormatException ex) {
+            logger.error("Please provide an integer for TRAFFIC_THRESHOLD");
             System.exit(1);
         }
         final String accessLogFilePath = args[0];
         final int secondsBetweenChecks = 10;
 
         StatsComputer statsComputer = new StatsComputer();
-        Alerter alerter = new Alerter();
+        Alerter alerter = new Alerter(trafficThreshold);
 
         Tailer.create(
                 Paths.get(accessLogFilePath).toFile(),
