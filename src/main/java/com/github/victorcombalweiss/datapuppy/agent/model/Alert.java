@@ -1,4 +1,4 @@
-package com.github.victorcombalweiss.datapuppy.model;
+package com.github.victorcombalweiss.datapuppy.agent.model;
 
 import java.util.Date;
 

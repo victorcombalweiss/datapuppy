@@ -1,6 +1,6 @@
-package com.github.victorcombalweiss.datapuppy;
+package com.github.victorcombalweiss.datapuppy.agent;
 
-import com.github.victorcombalweiss.datapuppy.model.AccessStats;
+import com.github.victorcombalweiss.datapuppy.agent.model.AccessStats;
 
 class StatsComputer {
 

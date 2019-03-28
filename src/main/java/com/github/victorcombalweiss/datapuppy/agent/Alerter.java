@@ -1,9 +1,9 @@
-package com.github.victorcombalweiss.datapuppy;
+package com.github.victorcombalweiss.datapuppy.agent;
 
 import java.util.Date;
 import java.util.Optional;
 
-import com.github.victorcombalweiss.datapuppy.model.Alert;
+import com.github.victorcombalweiss.datapuppy.agent.model.Alert;
 
 class Alerter {
 
