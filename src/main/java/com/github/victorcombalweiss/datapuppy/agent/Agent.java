@@ -1,7 +1,7 @@
 package com.github.victorcombalweiss.datapuppy.agent;
 
 import java.nio.file.Paths;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +35,7 @@ public class Agent {
         final int secondsBetweenChecks = 10;
 
         StatsComputer statsComputer = new StatsComputer();
-        Alerter alerter = new Alerter(trafficThreshold);
+        Alerter alerter = new Alerter(trafficThreshold, LocalDateTime.now());
 
         Tailer.create(
                 Paths.get(accessLogFilePath).toFile(),
@@ -44,7 +44,7 @@ public class Agent {
                     @Override
                     public void handle(String line) {
                         statsComputer.ingestLog(line);
-                        alerter.ingestLog(line, new Date());
+                        alerter.ingestLog(line, LocalDateTime.now());
                     }
                 },
                 1000,
@@ -56,7 +56,7 @@ public class Agent {
 
         Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(
                 () -> {
-                    Optional<Alert> alert = alerter.getNewAlert(new Date());
+                    Optional<Alert> alert = alerter.getNewAlert(LocalDateTime.now());
                     if (alert.isPresent()) {
                         logger.info("Triggering alert : " + alert.get());
                     }

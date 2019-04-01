@@ -1,18 +1,18 @@
 package com.github.victorcombalweiss.datapuppy.agent.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class Alert {
 
-    enum AlertType {
+    public enum AlertType {
         PEAK_TRAFFIC_START,
         PEAK_TRAFFIC_STOP
     }
 
     public final AlertType type;
-    public final Date time;
+    public final LocalDateTime time;
 
-    public Alert(AlertType type, Date time) {
+    public Alert(AlertType type, LocalDateTime time) {
         this.type = type;
         this.time = time;
     }

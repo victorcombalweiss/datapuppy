@@ -1,23 +1,70 @@
 package com.github.victorcombalweiss.datapuppy.agent;
 
-import java.util.Date;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.github.victorcombalweiss.datapuppy.agent.model.Alert;
+import com.github.victorcombalweiss.datapuppy.agent.model.Alert.AlertType;
+import com.google.common.collect.BoundType;
+import com.google.common.collect.SortedMultiset;
+import com.google.common.collect.TreeMultiset;
 
 class Alerter {
 
-    private final int trafficThreshold;
+    private static final int AVERAGING_PERIOD_IN_SECONDS = 120;
 
-    public Alerter(int trafficThreshold) {
+    private final double trafficThreshold;
+    private final LocalDateTime startTime;
+    private final SortedMultiset<LocalDateTime> logDates = TreeMultiset.create();
+
+    private AlertType currentStatus = null;
+
+    Alerter(double trafficThreshold, LocalDateTime startTime) {
+        if (trafficThreshold <= 0) {
+            throw new IllegalArgumentException("Traffic threshold must be strictly positive");
+        }
+        if (startTime == null) {
+            throw new IllegalArgumentException("Null passed as start time to " + Alerter.class.getSimpleName());
+        }
         this.trafficThreshold = trafficThreshold;
+        this.startTime = startTime;
     }
 
-    void ingestLog(String requestLog, Date forDate) {
-        // Not doing anything at the moment
+    void ingestLog(String requestLog, LocalDateTime logTime) {
+        logDates.add(logTime);
     }
 
-    Optional<Alert> getNewAlert(Date forDate) {
+    Optional<Alert> getNewAlert(LocalDateTime forTime) {
+        if (forTime == null) {
+            throw new IllegalArgumentException("Null passed as time for which to check for alerts");
+        }
+        LocalDateTime startOfAveragingPeriod = forTime.minusSeconds(AVERAGING_PERIOD_IN_SECONDS);
+        if (startOfAveragingPeriod.isBefore(startTime)) {
+            startOfAveragingPeriod = startTime;
+        }
+
+        logDates.headMultiset(startOfAveragingPeriod, BoundType.OPEN).clear();
+
+        double averagingPeriodDurationInSeconds = Duration.between(startOfAveragingPeriod, forTime)
+                .toNanos() / 1_000_000_000.0;
+        int requestCount = logDates.headMultiset(forTime, BoundType.CLOSED).size();
+        double requestsPerSecond = requestCount / averagingPeriodDurationInSeconds;
+
+        if (Double.isInfinite(requestsPerSecond)) {
+            return Optional.empty();
+        }
+        Alert result = null;
+        if (requestsPerSecond >= trafficThreshold && currentStatus != AlertType.PEAK_TRAFFIC_START) {
+            result = new Alert(AlertType.PEAK_TRAFFIC_START, forTime);
+        }
+        else if (requestsPerSecond < trafficThreshold && currentStatus == AlertType.PEAK_TRAFFIC_START) {
+            result = new Alert(AlertType.PEAK_TRAFFIC_STOP, forTime);
+        }
+        if (result != null) {
+            currentStatus = result.type;
+            return Optional.of(result);
+        }
         return Optional.empty();
     }
 }
