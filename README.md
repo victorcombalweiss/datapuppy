@@ -5,7 +5,7 @@
 or to pass arguments by command line:
 
     ./gradlew docker
-    docker run datapuppy myArg
+    docker run datapuppy --trafficThreshold=15
 
 ## Generating logs
 
