@@ -18,8 +18,15 @@ dependencies {
     compile group: "io.dropwizard", name: "dropwizard-assets", version: "$dropwizardVersion"
     compile group: "commons-io", name: "commons-io", version: "2.4"
     compile group: "com.github.pcj", name: "google-options", version: "1.0.0"
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter", version:"5.4.1"
 }
 
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
 
 def dockerImageName = "datapuppy"
 
