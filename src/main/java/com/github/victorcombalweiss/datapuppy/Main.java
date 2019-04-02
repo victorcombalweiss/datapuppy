@@ -38,8 +38,9 @@ public class Main {
           return;
         }
         final String accessLogFilePath = "/tmp/access.log";
+        final String alertFilePath = "~/.datapuppy/alerts";
 
         TestServer.main(new String[] { accessLogFilePath });
-        Agent.main(new String[] { accessLogFilePath, "" + options.trafficThreshold });
+        Agent.main(new String[] { accessLogFilePath, "" + options.trafficThreshold, alertFilePath });
     }
 }

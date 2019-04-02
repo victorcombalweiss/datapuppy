@@ -1,7 +1,11 @@
 package com.github.victorcombalweiss.datapuppy.agent;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -11,6 +15,9 @@ import org.apache.commons.io.input.TailerListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.victorcombalweiss.datapuppy.agent.model.Alert;
 
 public class Agent {
@@ -19,8 +26,8 @@ public class Agent {
 
     public static void main(String[] args) {
 
-        if (args == null || args.length < 2) {
-            logger.error("Usage: <command> ACCESS_LOG_FILE_PATH TRAFFIC_THRESHOLD");
+        if (args == null || args.length < 3) {
+            logger.error("Usage: <command> ACCESS_LOG_FILE_PATH TRAFFIC_THRESHOLD ALERT_FILE_PATH");
             System.exit(1);
         }
         int trafficThreshold = 0;
@@ -33,9 +40,10 @@ public class Agent {
         }
         final String accessLogFilePath = args[0];
         final int secondsBetweenChecks = 10;
+        final String alertFilePath = args[2];
 
         StatsComputer statsComputer = new StatsComputer();
-        Alerter alerter = new Alerter(trafficThreshold, LocalDateTime.now());
+        Alerter alerter = new Alerter(trafficThreshold, Instant.now());
 
         Tailer.create(
                 Paths.get(accessLogFilePath).toFile(),
@@ -44,7 +52,7 @@ public class Agent {
                     @Override
                     public void handle(String line) {
                         statsComputer.ingestLog(line);
-                        alerter.ingestLog(line, LocalDateTime.now());
+                        alerter.ingestLog(line, Instant.now());
                     }
                 },
                 1000,
@@ -54,11 +62,24 @@ public class Agent {
                 () -> logger.info("Outputting stats: " + statsComputer.getStatsAndReset()),
                 0, secondsBetweenChecks, TimeUnit.SECONDS);
 
+        Paths.get(alertFilePath).toFile().getParentFile().mkdirs();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
+
         Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(
                 () -> {
-                    Optional<Alert> alert = alerter.getNewAlert(LocalDateTime.now());
+                    Optional<Alert> alert = alerter.getNewAlert(Instant.now());
                     if (alert.isPresent()) {
-                        logger.info("Triggering alert : " + alert.get());
+                        logger.info("Alert triggered");
+                        try (PrintWriter writer = new PrintWriter(new BufferedWriter(
+                                new FileWriter(alertFilePath, true)))) {
+                            writer.println(objectMapper.writeValueAsString(alert.get()));
+                        }
+                        catch (IOException ex) {
+                            logger.error("Could not write to alert file", ex);
+                        }
                     }
                 },
                 0, 100, TimeUnit.MILLISECONDS);

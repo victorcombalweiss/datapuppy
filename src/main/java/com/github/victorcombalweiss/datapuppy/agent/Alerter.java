@@ -1,7 +1,7 @@
 package com.github.victorcombalweiss.datapuppy.agent;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import com.github.victorcombalweiss.datapuppy.agent.model.Alert;
@@ -15,12 +15,12 @@ class Alerter {
     private static final int AVERAGING_PERIOD_IN_SECONDS = 120;
 
     private final double trafficThreshold;
-    private final LocalDateTime startTime;
-    private final SortedMultiset<LocalDateTime> logDates = TreeMultiset.create();
+    private final Instant startTime;
+    private final SortedMultiset<Instant> logDates = TreeMultiset.create();
 
     private AlertType currentStatus = null;
 
-    Alerter(double trafficThreshold, LocalDateTime startTime) {
+    Alerter(double trafficThreshold, Instant startTime) {
         if (trafficThreshold <= 0) {
             throw new IllegalArgumentException("Traffic threshold must be strictly positive");
         }
@@ -31,15 +31,15 @@ class Alerter {
         this.startTime = startTime;
     }
 
-    void ingestLog(String requestLog, LocalDateTime logTime) {
+    void ingestLog(String requestLog, Instant logTime) {
         logDates.add(logTime);
     }
 
-    Optional<Alert> getNewAlert(LocalDateTime forTime) {
+    Optional<Alert> getNewAlert(Instant forTime) {
         if (forTime == null) {
             throw new IllegalArgumentException("Null passed as time for which to check for alerts");
         }
-        LocalDateTime startOfAveragingPeriod = forTime.minusSeconds(AVERAGING_PERIOD_IN_SECONDS);
+        Instant startOfAveragingPeriod = forTime.minusSeconds(AVERAGING_PERIOD_IN_SECONDS);
         if (startOfAveragingPeriod.isBefore(startTime)) {
             startOfAveragingPeriod = startTime;
         }
