@@ -40,7 +40,7 @@ dockerRun {
     name dockerImageName
     image dockerImageName
     daemonize false
-    ports '8080:8080'
+    ports '8080:8080', '9000:9000'
 }
 
 tasks.dockerRun.dependsOn "docker"

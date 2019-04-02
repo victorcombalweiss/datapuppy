@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.victorcombalweiss.datapuppy.agent.Agent;
 import com.github.victorcombalweiss.datapuppy.testserver.TestServer;
+import com.github.victorcombalweiss.datapuppy.webapp.WebApplication;
 import com.google.devtools.common.options.Option;
 import com.google.devtools.common.options.OptionsBase;
 import com.google.devtools.common.options.OptionsParser;
@@ -46,5 +47,6 @@ public class Main {
 
         TestServer.main(new String[] { accessLogFilePath });
         Agent.main(new String[] { accessLogFilePath, "" + options.trafficThreshold, alertFilePath });
+        WebApplication.main(new String[] { alertFilePath });
     }
 }
