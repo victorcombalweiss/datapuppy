@@ -1,5 +1,6 @@
 package com.github.victorcombalweiss.datapuppy;
 
+import java.nio.file.Paths;
 import java.util.Collections;
 
 import org.slf4j.Logger;
@@ -38,7 +39,10 @@ public class Main {
           return;
         }
         final String accessLogFilePath = "/tmp/access.log";
-        final String alertFilePath = "~/.datapuppy/alerts";
+        final String alertFilePath = Paths
+                .get(System.getProperty("user.home"))
+                .resolve(".datapuppy/alerts")
+                .toString();
 
         TestServer.main(new String[] { accessLogFilePath });
         Agent.main(new String[] { accessLogFilePath, "" + options.trafficThreshold, alertFilePath });
