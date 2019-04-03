@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+}
+
+#header {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #c9f0ff;
+}
+
+#alertBanner {
+    text-align: center;
+    padding: 20px 0;
+    background-color: red;
+}
+
+#mainBody {
+    max-width: 800px;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+#alertHistoryHeader {
+    padding: 10px;
+    border: 1px solid grey;
+}
+
+#alertList {
+    display: table;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#alertListHeader, .alert {
+    display: table-row;
+}
+
+.alertListHeaderElement, .alertType, .alertTime {
+    display: table-cell;
+    border: 1px solid grey;
+    padding: 10px;
+}
+
+#noAlertPanel {
+    width: 100%;
+    text-align: center;
+    padding: 100px 0;
+    border: 1px solid grey;
+}

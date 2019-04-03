@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -21,7 +22,7 @@ public class WebApplication extends Application<Configuration> {
         String alertFilePath = args[0];
         try {
             new WebApplication(alertFilePath).run("server",
-                    "com/github/victorcombalweiss/datapuppy/webapp/configuration.yml");
+                    WebApplication.class.getPackage().getName().replaceAll("\\.", "/") + "/configuration.yml");
         } catch (Exception ex) {
             logger.error("An error occurred when trying to run server", ex);
             System.exit(2);
@@ -42,10 +43,14 @@ public class WebApplication extends Application<Configuration> {
     @Override
     public void initialize(Bootstrap<Configuration> bootstrap) {
         bootstrap.setConfigurationSourceProvider(new ResourceConfigurationSourceProvider());
+        bootstrap.addBundle(new AssetsBundle(
+            "/" + WebApplication.class.getPackage().getName().replaceAll("\\.", "/") + "/public",
+            "/"));
     }
 
     @Override
     public void run(Configuration configuration, Environment environment) throws Exception {
+        environment.jersey().setUrlPattern("/api/*");
         environment.jersey().register(new ApiResource(alertFilePath));
     }
 }

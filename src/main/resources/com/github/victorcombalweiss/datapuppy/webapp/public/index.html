@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
+        <script src="index.js"></script>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body>
+        <div id="root"></div>
+        <template id="rootTemplate" type="text/x-handlebars-template">
+
+            <div id="header">
+                Datapuppy
+            </div>
+
+            {{#if onGoingAlert}}
+            <div id="alertBanner">
+                High traffic detected
+            </div>
+            {{/if}}
+
+            <div id="mainBody">
+                <div id="alertHistory">
+                    <div id="alertHistoryHeader">
+                        Alert history
+                    </div>
+
+                    {{#if alerts}}
+                    <div id="alertList">
+                        <div id="alertListHeader">
+                            <div class="alertListHeaderElement">Time</div>
+                            <div class="alertListHeaderElement">Type</div>
+                        </div>
+                        {{#each alerts}}
+                        <div class="alert">
+                            <div class="alertTime">{{this.time}}</div>
+                            <div class="alertType">{{this.type}}</div>
+                        </div>
+                        {{/each}}
+                    </div>
+
+                    {{else}}
+                    <div id="noAlertPanel">
+                        No alert recorded :)
+                    </div>
+                    {{/if}}
+                </div>
+            </div>
+        </template>
+    </body>
+</html>
