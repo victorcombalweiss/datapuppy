@@ -9,9 +9,9 @@ or to pass arguments by command line:
 
 ## Watching
 
-Point your web browser to `<docker-machine ip>:9000/index.html`.
+Point your web browser to `<docker-machine ip>:9000`.
 
-Example: `http://192.168.99.100:9000/index.html`
+Example: `http://192.168.99.100:9000`
 
 ## Generating logs
 

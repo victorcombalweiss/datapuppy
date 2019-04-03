@@ -45,7 +45,8 @@ public class WebApplication extends Application<Configuration> {
         bootstrap.setConfigurationSourceProvider(new ResourceConfigurationSourceProvider());
         bootstrap.addBundle(new AssetsBundle(
             "/" + WebApplication.class.getPackage().getName().replaceAll("\\.", "/") + "/public",
-            "/"));
+            "/",
+            "index.html"));
     }
 
     @Override
