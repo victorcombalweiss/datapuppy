@@ -7,6 +7,12 @@ or to pass arguments by command line:
     ./gradlew docker
     docker run -p 8080:8080 -p 9000:9000 datapuppy --trafficThreshold=15
 
+## Watching
+
+Point your web browser to `<docker-machine ip>:9000/index.html`.
+
+Example: `http://192.168.99.100:9000/index.html`
+
 ## Generating logs
 
 When container boots it starts up a test server that writes requests to the watched log file.
