@@ -1,9 +1,8 @@
 package com.github.victorcombalweiss.datapuppy.agent;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +69,7 @@ class StatsComputer {
     }
 
     private AccessStats getStats() {
-        List<Map.Entry<String, Integer>> orderedSectionHits = sectionHits.entrySet()
+        Map<String, Integer> orderedSectionHits = sectionHits.entrySet()
                 .stream()
                 .sorted((entry1, entry2) -> {
                     if (entry1.getValue() > entry2.getValue()) {
@@ -81,7 +80,9 @@ class StatsComputer {
                     }
                     return 1;
                 })
-                .collect(Collectors.toList());
+                .collect(LinkedHashMap::new,
+                        (map, entry) -> map.put(entry.getKey(), entry.getValue()),
+                        Map::putAll);
         return new AccessStats(orderedSectionHits);
     }
 

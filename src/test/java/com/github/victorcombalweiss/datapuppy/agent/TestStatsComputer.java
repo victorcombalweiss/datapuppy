@@ -1,14 +1,13 @@
 package com.github.victorcombalweiss.datapuppy.agent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static java.util.AbstractMap.SimpleEntry;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
 import com.github.victorcombalweiss.datapuppy.agent.model.AccessStats;
+import com.google.common.collect.ImmutableMap;
 
 public class TestStatsComputer {
 
@@ -23,9 +22,9 @@ public class TestStatsComputer {
         AccessStats result = statsComputer.getStatsAndReset();
 
         assertEquals(
-                new AccessStats(Arrays.asList(
-                        new SimpleEntry<>("/api", 3),
-                        new SimpleEntry<>("/report", 1))),
+                new AccessStats(ImmutableMap.of(
+                        "/api", 3,
+                        "/report", 1)),
                 result);
     }
 
@@ -39,9 +38,10 @@ public class TestStatsComputer {
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Arrays.asList(
-                        new SimpleEntry<>("/banana", 2),
-                        new SimpleEntry<>("/pear", 2)),
+        assertEquals(
+                ImmutableMap.of(
+                        "/banana", 2,
+                        "/pear", 2),
                 result.sectionHits);
     }
 
@@ -67,7 +67,7 @@ public class TestStatsComputer {
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Arrays.asList(new SimpleEntry<>("/", 1)), result.sectionHits);
+        assertEquals(ImmutableMap.of("/", 1), result.sectionHits);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class TestStatsComputer {
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Arrays.asList(new SimpleEntry<>("/banana", 1)), result.sectionHits);
+        assertEquals(ImmutableMap.of("/banana", 1), result.sectionHits);
     }
 
     @Test
@@ -86,7 +86,7 @@ public class TestStatsComputer {
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Collections.emptyList(), result.sectionHits);
+        assertEquals(Collections.emptyMap(), result.sectionHits);
     }
 
     @Test
@@ -97,7 +97,7 @@ public class TestStatsComputer {
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Arrays.asList(new SimpleEntry<>("/banana", 2)), result.sectionHits);
+        assertEquals(ImmutableMap.of("/banana", 2), result.sectionHits);
     }
 
     /**************************** Invalid input *******************************/
@@ -109,7 +109,7 @@ public class TestStatsComputer {
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Collections.emptyList(), result.sectionHits);
+        assertEquals(Collections.emptyMap(), result.sectionHits);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class TestStatsComputer {
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Collections.emptyList(), result.sectionHits);
+        assertEquals(Collections.emptyMap(), result.sectionHits);
     }
 
 
@@ -132,6 +132,6 @@ public class TestStatsComputer {
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Collections.emptyList(), result.sectionHits);
+        assertEquals(Collections.emptyMap(), result.sectionHits);
     }
 }
