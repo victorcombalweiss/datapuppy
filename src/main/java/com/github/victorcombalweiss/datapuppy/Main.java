@@ -1,5 +1,6 @@
 package com.github.victorcombalweiss.datapuppy;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 
@@ -40,13 +41,17 @@ public class Main {
           return;
         }
         final String accessLogFilePath = "/tmp/access.log";
-        final String alertFilePath = Paths
+        final Path agentOutputDirectory = Paths
                 .get(System.getProperty("user.home"))
-                .resolve(".datapuppy/alerts")
+                .resolve(".datapuppy");
+        final String alertFilePath = agentOutputDirectory.resolve("alerts")
+                .toString();
+        final String statsFilePath = agentOutputDirectory.resolve("stats.json")
                 .toString();
 
         TestServer.main(new String[] { accessLogFilePath });
-        Agent.main(new String[] { accessLogFilePath, "" + options.trafficThreshold, alertFilePath });
+        Agent.main(new String[] { accessLogFilePath, "" + options.trafficThreshold, alertFilePath,
+                statsFilePath });
         WebApplication.main(new String[] { alertFilePath });
     }
 }
