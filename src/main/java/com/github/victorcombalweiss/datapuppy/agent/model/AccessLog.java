@@ -9,6 +9,7 @@ public class AccessLog {
     private HttpMethod httpMethod;
     private String request;
     private int httpStatus;
+    private int responseWeight;
 
     @Field("HTTP.PATH:request.firstline.uri.path")
     public void setRequest(final String request) {
@@ -35,5 +36,14 @@ public class AccessLog {
 
     public HttpMethod getHttpMethod() {
         return httpMethod;
+    }
+
+    @Field("BYTESCLF:response.body.bytes")
+    public void setResponseWeight(final String bytes) {
+        this.responseWeight = Integer.parseInt(bytes);
+    }
+
+    public int getResponseWeight() {
+        return responseWeight;
     }
 }

@@ -1,11 +1,14 @@
 package com.github.victorcombalweiss.datapuppy.agent;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -13,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.victorcombalweiss.datapuppy.agent.model.AccessLog;
 import com.github.victorcombalweiss.datapuppy.agent.model.AccessStats;
+import com.github.victorcombalweiss.datapuppy.agent.model.RequestWithWeight;
 import com.github.victorcombalweiss.datapuppy.agent.model.StatsOfARequestCategory;
 import com.google.common.base.Strings;
 
@@ -28,11 +32,14 @@ class StatsComputer {
     private static final String LOG_FORMATS = "%h %l %u %t \"%r\" %>s %b"
             + "\n"
             + "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" %T";
+    private static final int MAX_ELEMENT_COUNT_IN_LISTS = 5;
 
     private final Map<String, Integer> sectionHits = new HashMap<>();
     private final SortedMap<Integer, StatsOfARequestCategory> errorStats =
             new TreeMap<>(Collections.reverseOrder());
     private final Map<String, Integer> singleRequestOccurrences = new HashMap<>();
+    private final NavigableSet<RequestWithWeight> requestsOrderedByWeight = new TreeSet<>();
+
     private final Parser<AccessLog> accessLogParser = new HttpdLoglineParser<>(AccessLog.class, LOG_FORMATS);
 
     void ingestLog(String rawAccessLog) {
@@ -44,6 +51,7 @@ class StatsComputer {
             AccessLog accessLog = accessLogParser.parse(rawAccessLog);
             updateSectionHits(accessLog);
             updateErrorStats(accessLog);
+            updateRequestsOrderedByWeight(accessLog, rawAccessLog);
         } catch (DissectionFailure | InvalidDissectorException | MissingDissectorsException ex) {
             logger.error("Failed parsing access log line. Skipping it: '" + rawAccessLog + "'",
                     ex);
@@ -99,6 +107,14 @@ class StatsComputer {
                 topRequestOccurrences));
     }
 
+    private void updateRequestsOrderedByWeight(AccessLog accessLog, String rawAccessLog) {
+        int responseWeight = accessLog.getResponseWeight();
+        requestsOrderedByWeight.add(new RequestWithWeight(responseWeight, rawAccessLog));
+        while (requestsOrderedByWeight.size() > MAX_ELEMENT_COUNT_IN_LISTS) {
+            requestsOrderedByWeight.pollLast();
+        }
+    }
+
     AccessStats getStatsAndReset() {
         AccessStats stats = getStats();
         reset();
@@ -120,12 +136,13 @@ class StatsComputer {
                 .collect(LinkedHashMap::new,
                         (map, entry) -> map.put(entry.getKey(), entry.getValue()),
                         Map::putAll);
-        return new AccessStats(orderedSectionHits, errorStats);
+        return new AccessStats(orderedSectionHits, errorStats, new ArrayList<>(requestsOrderedByWeight));
     }
 
     private void reset() {
         sectionHits.clear();
         errorStats.clear();
         singleRequestOccurrences.clear();
+        requestsOrderedByWeight.clear();
     }
 }

@@ -88,6 +88,31 @@
                         </div>
                         {{/if}}
                     </div>
+                    <div>
+                        <div class="tableTitle">
+                            Heaviest responses
+                        </div>
+                        <div class="table">
+                            <div class="tableHeader">
+                                <div class="tableHeaderElement">
+                                    Bytes
+                                </div>
+                                <div class="tableHeaderElement">
+                                    Request
+                                </div>
+                            </div>
+                            {{#each stats.heaviestResponses}}
+                            <div class="tableRow">
+                                <div class="tableCell">
+                                    {{this.bytes}}
+                                </div>
+                                <div class="tableCell">
+                                    {{this.request}}
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
 
                     {{else}}
                     <div class="tableTitle">
