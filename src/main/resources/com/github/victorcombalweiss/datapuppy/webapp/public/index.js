@@ -32,6 +32,8 @@ function getApiData(subPath) {
 }
 
 function compileData(alertData, statsData) {
+	statsData['requestsWithErrors'] = statsIncludeRequestsWithErrors(statsData);
+	statsData['sortedErrorCodes'] = sortedErrorCodes(statsData);
     return {
         onGoingAlert: onGoingAlert(alertData),
         alerts: alertData,
@@ -46,6 +48,17 @@ function onGoingAlert(alerts) {
 
 function statsPresent(stats) {
 	return stats && Object.entries(stats.sectionHits).length > 0;
+}
+
+function statsIncludeRequestsWithErrors(stats) {
+    return stats && stats.errors && Object.entries(stats.errors).length > 0;
+}
+
+function sortedErrorCodes(stats) {
+	if (!statsIncludeRequestsWithErrors(stats)) {
+		return [];
+	}
+	return Object.keys(stats.errors).sort().reverse();
 }
 
 function render(data) {

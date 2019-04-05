@@ -1,14 +1,19 @@
 package com.github.victorcombalweiss.datapuppy.agent;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.victorcombalweiss.datapuppy.agent.model.AccessLog;
 import com.github.victorcombalweiss.datapuppy.agent.model.AccessStats;
+import com.github.victorcombalweiss.datapuppy.agent.model.StatsOfARequestCategory;
 import com.google.common.base.Strings;
 
 import nl.basjes.parse.core.Parser;
@@ -25,6 +30,9 @@ class StatsComputer {
             + "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" %T";
 
     private final Map<String, Integer> sectionHits = new HashMap<>();
+    private final SortedMap<Integer, StatsOfARequestCategory> errorStats =
+            new TreeMap<>(Collections.reverseOrder());
+    private final Map<String, Integer> singleRequestOccurrences = new HashMap<>();
     private final Parser<AccessLog> accessLogParser = new HttpdLoglineParser<>(AccessLog.class, LOG_FORMATS);
 
     void ingestLog(String rawAccessLog) {
@@ -35,6 +43,7 @@ class StatsComputer {
         try {
             AccessLog accessLog = accessLogParser.parse(rawAccessLog);
             updateSectionHits(accessLog);
+            updateErrorStats(accessLog);
         } catch (DissectionFailure | InvalidDissectorException | MissingDissectorsException ex) {
             logger.error("Failed parsing access log line. Skipping it: '" + rawAccessLog + "'",
                     ex);
@@ -62,6 +71,34 @@ class StatsComputer {
         return request.substring(0, indexOfSlash);
     }
 
+    private void updateErrorStats(AccessLog accessLog) {
+        int httpStatus = accessLog.getHttpStatus();
+        if (!HttpStatus.isClientError(httpStatus) && !HttpStatus.isServerError(httpStatus)) {
+            return;
+        }
+        String fullRequest = httpStatus + " " + accessLog.getHttpMethod() + " " + accessLog.getRequest();
+
+        Integer currentSingleRequestOccurrences = singleRequestOccurrences.get(fullRequest);
+        int newSingleRequestOccurrences = currentSingleRequestOccurrences == null
+                ? 1 : currentSingleRequestOccurrences + 1;
+        singleRequestOccurrences.put(fullRequest, newSingleRequestOccurrences);
+
+        StatsOfARequestCategory currentStats = errorStats.get(httpStatus);
+        int errorCodeOccurrences = currentStats == null ? 1 : currentStats.occurrences + 1;
+        Integer previousTopRequestOccurrences = currentStats == null
+                ? 0 : singleRequestOccurrences.get(httpStatus + " " + currentStats.topRequest);
+        boolean newRequestIsTopRequestForItsErrorCode = previousTopRequestOccurrences == null
+                || newSingleRequestOccurrences > previousTopRequestOccurrences;
+        String topRequest = newRequestIsTopRequestForItsErrorCode
+                ? accessLog.getHttpMethod() + " " + accessLog.getRequest() : currentStats.topRequest;
+        int topRequestOccurrences = newRequestIsTopRequestForItsErrorCode
+                ? newSingleRequestOccurrences : previousTopRequestOccurrences;
+        errorStats.put(httpStatus, new StatsOfARequestCategory(
+                errorCodeOccurrences,
+                topRequest,
+                topRequestOccurrences));
+    }
+
     AccessStats getStatsAndReset() {
         AccessStats stats = getStats();
         reset();
@@ -83,10 +120,12 @@ class StatsComputer {
                 .collect(LinkedHashMap::new,
                         (map, entry) -> map.put(entry.getKey(), entry.getValue()),
                         Map::putAll);
-        return new AccessStats(orderedSectionHits);
+        return new AccessStats(orderedSectionHits, errorStats);
     }
 
     private void reset() {
         sectionHits.clear();
+        errorStats.clear();
+        singleRequestOccurrences.clear();
     }
 }

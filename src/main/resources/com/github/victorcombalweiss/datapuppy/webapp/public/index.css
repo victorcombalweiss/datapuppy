@@ -20,33 +20,33 @@ body {
     padding-top: 20px;
 }
 
-#stats {
+.card {
     margin-bottom: 20px;
 }
 
-#alertHistoryHeader, #statsHeader, #sectionHitsHeader {
+.tableTitle {
     padding: 10px;
     border: 1px solid grey;
 }
 
-#alertList, #sectionHitsList {
+.table {
     display: table;
     border-collapse: collapse;
     width: 100%;
+    margin-bottom: 20px;
 }
 
-#alertListHeader, .alert, #sectionHitsListHeader, .sectionHitElement {
+.tableRow, .tableHeader {
     display: table-row;
 }
 
-.alertListHeaderElement, .alertType, .alertTime, .sectionHitsListHeaderElement,
-    .sectionHitElementSectionName, .sectionHitElementHitCount {
+.tableHeaderElement, .tableCell {
     display: table-cell;
     border: 1px solid grey;
     padding: 10px;
 }
 
-#noAlertPanel, #noStatsPanel {
+.replacementMessage {
     width: 100%;
     text-align: center;
     padding: 100px 0;

@@ -7,6 +7,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
 import com.github.victorcombalweiss.datapuppy.agent.model.AccessStats;
+import com.github.victorcombalweiss.datapuppy.agent.model.StatsOfARequestCategory;
 import com.google.common.collect.ImmutableMap;
 
 public class TestStatsComputer {
@@ -17,14 +18,15 @@ public class TestStatsComputer {
         statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET /report HTTP/1.0\" 200 123");
         statsComputer.ingestLog("127.0.0.1 - jill [09/May/2018:16:00:41 +0000] \"GET /api/user HTTP/1.0\" 200 234");
         statsComputer.ingestLog("127.0.0.1 - frank [09/May/2018:16:00:42 +0000] \"POST /api/user HTTP/1.0\" 200 34");
-        statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /api/user HTTP/1.0\" 503 12");
+        statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /api/user HTTP/1.0\" 303 12");
 
         AccessStats result = statsComputer.getStatsAndReset();
 
         assertEquals(
                 new AccessStats(ImmutableMap.of(
                         "/api", 3,
-                        "/report", 1)),
+                        "/report", 1),
+                        Collections.emptySortedMap()),
                 result);
     }
 
@@ -43,6 +45,22 @@ public class TestStatsComputer {
                         "/banana", 2,
                         "/pear", 2),
                 result.sectionHits);
+    }
+
+    @Test
+    void testStatsComputer_normalCaseWithErrors_returnCorrectErrorStats() {
+        StatsComputer statsComputer = new StatsComputer();
+        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET /report HTTP/1.0\" 404 123");
+        statsComputer.ingestLog("127.0.0.1 - jill [09/May/2018:16:00:41 +0000] \"GET /api/user HTTP/1.0\" 404 234");
+        statsComputer.ingestLog("127.0.0.1 - frank [09/May/2018:16:00:42 +0000] \"POST /api/user HTTP/1.0\" 500 34");
+        statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /api/user HTTP/1.0\" 503 12");
+
+        AccessStats result = statsComputer.getStatsAndReset();
+
+        assertEquals(ImmutableMap.of(
+                503, new StatsOfARequestCategory(1, "POST /api/user", 1),
+                500, new StatsOfARequestCategory(1, "POST /api/user", 1),
+                404, new StatsOfARequestCategory(2, "GET /report", 1)), result.errors);
     }
 
     /**************************** Corner cases *******************************/
@@ -103,28 +121,35 @@ public class TestStatsComputer {
     /**************************** Invalid input *******************************/
 
     @Test
-    void testStatsComputer_nullLog_returnEmptySectionHits() {
+    void testStatsComputer_nullLog_returnEmptyStats() {
         StatsComputer statsComputer = new StatsComputer();
         statsComputer.ingestLog(null);
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Collections.emptyMap(), result.sectionHits);
+        assertEquals(
+                new AccessStats(
+                        Collections.emptyMap(),
+                        Collections.emptySortedMap()),
+                result);
     }
 
     @Test
-    void testStatsComputer_emptyLogLine_returnEmptySectionHits() {
+    void testStatsComputer_emptyLogLine_returnEmptyStats() {
         StatsComputer statsComputer = new StatsComputer();
         statsComputer.ingestLog("");
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Collections.emptyMap(), result.sectionHits);
+        assertEquals(
+                new AccessStats(
+                        Collections.emptyMap(),
+                        Collections.emptySortedMap()),
+                result);
     }
 
-
     @Test
-    void testStatsComputer_wrongFormatLogLine_returnEmptySectionHits() {
+    void testStatsComputer_wrongFormatLogLine_returnEmptyStats() {
         StatsComputer statsComputer = new StatsComputer();
         statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] "
                 + "\"GET /banana/pork HTTP/1.0\" 200 123 "
@@ -132,6 +157,40 @@ public class TestStatsComputer {
 
         AccessStats result = statsComputer.getStatsAndReset();
 
-        assertEquals(Collections.emptyMap(), result.sectionHits);
+        assertEquals(
+                new AccessStats(
+                        Collections.emptyMap(),
+                        Collections.emptySortedMap()),
+                result);
+    }
+
+    @Test
+    void testStatsComputer_wrongHttpMethod_returnEmptyStats() {
+        StatsComputer statsComputer = new StatsComputer();
+        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] "
+                + "\"HI /banana/pork HTTP/1.0\" 200 123 ");
+
+        AccessStats result = statsComputer.getStatsAndReset();
+
+        assertEquals(
+                new AccessStats(
+                        Collections.emptyMap(),
+                        Collections.emptySortedMap()),
+                result);
+    }
+
+    @Test
+    void testStatsComputer_wrongHttpStatus_returnEmptyStats() {
+        StatsComputer statsComputer = new StatsComputer();
+        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] "
+                + "\"GET /banana/pork HTTP/1.0\" 666 123 ");
+
+        AccessStats result = statsComputer.getStatsAndReset();
+
+        assertEquals(
+                new AccessStats(
+                        Collections.emptyMap(),
+                        Collections.emptySortedMap()),
+                result);
     }
 }
