@@ -19,6 +19,45 @@
             {{/if}}
 
             <div id="mainBody">
+                <div id="stats">
+
+                    {{#if statsPresent }}
+                    <div id="sectionHits">
+                        <div id="sectionHitsHeader">
+                            Most hit website sections
+                        </div>
+                        <div id="sectionHitsList">
+                            <div id="sectionHitsListHeader">
+                                <div class="sectionHitsListHeaderElement">
+                                    Section
+                                </div>
+                                <div class="sectionHitsListHeaderElement">
+                                    Hits
+                                </div>
+                            </div>
+                            {{#each stats.sectionHits}}
+                            <div class="sectionHitElement">
+                                <div class="sectionHitElementSectionName">
+                                    {{@key}}
+                                </div>
+                                <div class="sectionHitElementHitCount">
+                                    {{this}}
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
+
+                    {{else}}
+                    <div id="statsHeader">
+                        Stats
+                    </div>
+                    <div id="noStatsPanel">
+                        No request recorded recently
+                    </div>
+                    {{/if}}
+
+                </div>
                 <div id="alertHistory">
                     <div id="alertHistoryHeader">
                         Alert history

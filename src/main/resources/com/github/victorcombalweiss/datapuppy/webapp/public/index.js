@@ -5,7 +5,8 @@ const ROOT_ID = "root";
 function refresh() {
     try {
         var alertData = getAlertData();
-        var data = compileData(alertData);
+        var statsData = getStatsData();
+        var data = compileData(alertData, statsData);
         render(data);
     }
     catch (error) {
@@ -16,21 +17,35 @@ function refresh() {
 }
 
 function getAlertData() {
+    return getApiData("alerts");
+}
+
+function getStatsData() {
+    return getApiData("stats");
+}
+
+function getApiData(subPath) {
     var request = new XMLHttpRequest();
-    request.open("GET", "/api/alerts", false);
+    request.open("GET", "/api/" + subPath, false);
     request.send(null);
     return JSON.parse(request.responseText);
 }
 
-function compileData(alertData) {
+function compileData(alertData, statsData) {
     return {
         onGoingAlert: onGoingAlert(alertData),
-        alerts: alertData
+        alerts: alertData,
+        statsPresent: statsPresent(statsData),
+        stats: statsData
     };
 }
 
 function onGoingAlert(alerts) {
     return alerts && alerts.length > 0 && alerts[alerts.length - 1].type == "PEAK_TRAFFIC_START";
+}
+
+function statsPresent(stats) {
+	return stats && Object.entries(stats.sectionHits).length > 0;
 }
 
 function render(data) {
