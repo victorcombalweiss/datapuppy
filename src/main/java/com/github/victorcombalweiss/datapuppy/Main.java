@@ -52,6 +52,6 @@ public class Main {
         TestServer.main(new String[] { accessLogFilePath });
         Agent.main(new String[] { accessLogFilePath, "" + options.trafficThreshold, alertFilePath,
                 statsFilePath });
-        WebApplication.main(new String[] { alertFilePath });
+        WebApplication.main(new String[] { alertFilePath, statsFilePath });
     }
 }

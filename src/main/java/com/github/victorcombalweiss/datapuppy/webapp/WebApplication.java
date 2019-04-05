@@ -15,13 +15,14 @@ public class WebApplication extends Application<Configuration> {
     private static final Logger logger = LoggerFactory.getLogger(WebApplication.class);
 
     public static void main(String[] args) {
-        if (args == null || args.length < 1) {
-            System.err.println("Usage: <command> ALERT_FILE_PATH");
+        if (args == null || args.length < 2) {
+            System.err.println("Usage: <command> ALERT_FILE_PATH STATS_FILE_PATH");
             System.exit(1);
         }
         String alertFilePath = args[0];
+        String statsFilePath = args[1];
         try {
-            new WebApplication(alertFilePath).run("server",
+            new WebApplication(alertFilePath, statsFilePath).run("server",
                     WebApplication.class.getPackage().getName().replaceAll("\\.", "/") + "/configuration.yml");
         } catch (Exception ex) {
             logger.error("An error occurred when trying to run server", ex);
@@ -30,9 +31,11 @@ public class WebApplication extends Application<Configuration> {
     }
 
     private final String alertFilePath;
+    private final String statsFilePath;
 
-    public WebApplication(String alertFilePath) {
+    public WebApplication(String alertFilePath, String statsFilePath) {
         this.alertFilePath = alertFilePath;
+        this.statsFilePath = statsFilePath;
     }
 
     @Override
@@ -52,6 +55,6 @@ public class WebApplication extends Application<Configuration> {
     @Override
     public void run(Configuration configuration, Environment environment) throws Exception {
         environment.jersey().setUrlPattern("/api/*");
-        environment.jersey().register(new ApiResource(alertFilePath));
+        environment.jersey().register(new ApiResource(alertFilePath, statsFilePath));
     }
 }

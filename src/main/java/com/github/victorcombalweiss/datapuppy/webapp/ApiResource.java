@@ -1,9 +1,11 @@
 package com.github.victorcombalweiss.datapuppy.webapp;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.StringJoiner;
 
 import javax.ws.rs.GET;
@@ -23,9 +25,11 @@ public class ApiResource {
     private static final Logger logger = LoggerFactory.getLogger(ApiResource.class);
 
     private final String alertFilePath;
+    private final String statsFilePath;
 
-    ApiResource(String alertFilePath) {
+    ApiResource(String alertFilePath, String statsFilePath) {
         this.alertFilePath = alertFilePath;
+        this.statsFilePath = statsFilePath;
     }
 
     @Path("/alerts")
@@ -47,4 +51,10 @@ public class ApiResource {
         }
     }
 
+    @Path("/stats")
+    @GET
+    @Timed
+    public File getStats() {
+        return Paths.get(statsFilePath).toFile();
+    }
 }
