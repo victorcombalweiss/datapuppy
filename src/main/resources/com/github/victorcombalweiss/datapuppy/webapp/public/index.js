@@ -3,7 +3,21 @@ const ROOT_TEMPLATE_ID = "rootTemplate";
 const ROOT_ID = "root";
 const MAIN_BODY_WRAPPER_ID = "mainBodyWrapper";
 
+const PEAK_TRAFFIC_START_ALERT_TYPE = "PEAK_TRAFFIC_START";
+const PEAK_TRAFFIC_STOP_ALERT_TYPE = "PEAK_TRAFFIC_STOP";
+
 HandlebarsIntl.registerWith(Handlebars);
+
+Handlebars.registerHelper("formatAlertType", function(alertType) {
+    switch (alertType) {
+    case PEAK_TRAFFIC_START_ALERT_TYPE:
+        return "High traffic alert triggered";
+    case PEAK_TRAFFIC_STOP_ALERT_TYPE:
+        return "End of high traffic";
+    default:
+        return alertType;
+    }
+});
 
 function refresh() {
     try {
@@ -46,7 +60,8 @@ function compileData(alertData, statsData) {
 }
 
 function onGoingAlert(alerts) {
-    return alerts && alerts.length > 0 && alerts[alerts.length - 1].type == "PEAK_TRAFFIC_START";
+    return alerts && alerts.length > 0
+        && alerts[alerts.length - 1].type == PEAK_TRAFFIC_START_ALERT_TYPE;
 }
 
 function statsPresent(stats) {
