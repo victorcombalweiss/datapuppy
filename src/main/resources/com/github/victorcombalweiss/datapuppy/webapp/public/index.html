@@ -1,6 +1,7 @@
 <html>
     <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/handlebars-intl@1.1.2/dist/handlebars-intl.min.js"></script>
         <script src="index.js"></script>
         <link rel="stylesheet" href="index.css">
     </head>
@@ -137,7 +138,11 @@
                             </div>
                             {{#each alerts}}
                             <div class="tableRow">
-                                <div class="tableCell">{{this.time}}</div>
+                                <div class="tableCell">
+                                    {{formatTime this.time day="numeric" month="long" year="numeric"
+                                        hour="numeric" minute="numeric" second="numeric"}}
+                                    ({{formatRelative this.time}})
+                                </div>
                                 <div class="tableCell">{{this.type}}</div>
                             </div>
                             {{/each}}

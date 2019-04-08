@@ -3,6 +3,8 @@ const ROOT_TEMPLATE_ID = "rootTemplate";
 const ROOT_ID = "root";
 const MAIN_BODY_WRAPPER_ID = "mainBodyWrapper";
 
+HandlebarsIntl.registerWith(Handlebars);
+
 function refresh() {
     try {
         var alertData = getAlertData();
