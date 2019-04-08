@@ -1,3 +1,13 @@
+@font-face{
+    font-family:NationalWeb;
+    src: url(https://www.datadoghq.com/fonts/web-fonts/NationalWeb-Light.woff2) format("woff2"),
+        url(https://www.datadoghq.com/fonts/web-fonts/NationalWeb-Light.woff) format("woff"),
+        url(https://www.datadoghq.com/fonts/web-fonts/NationalWeb-Light.eot) format("embedded-opentype");
+    font-weight:200;
+    font-style:normal;
+    font-stretch:normal
+}
+
 body {
     margin: 0;
 }
@@ -10,8 +20,18 @@ body {
 
 #header {
     text-align: center;
-    padding: 20px 0;
+    padding: 20px 0 10px 0;
     background-color: #c9f0ff;
+    font-family: NationalWeb, Helvetica, Arial, sans-serif;
+    text-transform: uppercase;
+    font-size: 2em;
+    color: white;
+}
+
+#header img {
+    height: 70px;
+    vertical-align: middle;
+    margin-top: -10px;
 }
 
 #alertBanner {
