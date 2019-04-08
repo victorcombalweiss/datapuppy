@@ -132,13 +132,9 @@
 
                         {{#if alerts}}
                         <div class="table">
-                            <div class="tableHeader">
-                                <div class="tableHeaderElement">Time</div>
-                                <div class="tableHeaderElement">Type</div>
-                            </div>
                             {{#each alerts}}
                             <div class="tableRow">
-                                <div class="tableCell">
+                                <div class="tableCell alertTime">
                                     {{formatTime this.time day="numeric" month="long" year="numeric"
                                         hour="numeric" minute="numeric" second="numeric"}}
                                     ({{formatRelative this.time}})

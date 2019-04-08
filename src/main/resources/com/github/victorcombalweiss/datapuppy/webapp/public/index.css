@@ -58,6 +58,10 @@ body {
     padding: 10px;
 }
 
+.alertTime {
+    width: 50%;
+}
+
 .replacementMessage {
     width: 100%;
     text-align: center;
