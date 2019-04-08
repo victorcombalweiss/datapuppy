@@ -1,6 +1,7 @@
 const REFRESH_PERIOD = 1000;
 const ROOT_TEMPLATE_ID = "rootTemplate";
 const ROOT_ID = "root";
+const MAIN_BODY_WRAPPER_ID = "mainBodyWrapper";
 
 function refresh() {
     try {
@@ -62,10 +63,24 @@ function sortedErrorCodes(stats) {
 }
 
 function render(data) {
+    let top = 0, left = 0;
+    let mainBodyWrapper = getMainBodyWrapper();
+    if (mainBodyWrapper) {
+        top = mainBodyWrapper.scrollTop;
+        left = mainBodyWrapper.scrollLeft;
+    }
     if (document.getElementById(ROOT_TEMPLATE_ID) && document.getElementById(ROOT_ID)) {
         var template = Handlebars.compile(document.getElementById(ROOT_TEMPLATE_ID).innerHTML);
         document.getElementById(ROOT_ID).innerHTML = template(data);
     }
+    mainBodyWrapper = getMainBodyWrapper();
+    if (mainBodyWrapper) {
+        mainBodyWrapper.scrollTo(left, top);
+    }
+}
+
+function getMainBodyWrapper() {
+    return document.getElementById(MAIN_BODY_WRAPPER_ID);
 }
 
 refresh();

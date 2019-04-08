@@ -18,135 +18,137 @@
             </div>
             {{/if}}
 
-            <div id="mainBody">
-                <div class="card">
+            <div id="mainBodyWrapper">
+                <div id="mainBody">
+                    <div class="card">
 
-                    {{#if statsPresent }}
-                    <div>
+                        {{#if statsPresent }}
+                        <div>
+                            <div class="tableTitle">
+                                Most hit website sections
+                            </div>
+                            <div class="table">
+                                <div class="tableHeader">
+                                    <div class="tableHeaderElement">
+                                        Section
+                                    </div>
+                                    <div class="tableHeaderElement">
+                                        Hits
+                                    </div>
+                                </div>
+                                {{#each stats.sectionHits}}
+                                <div class="tableRow">
+                                    <div class="tableCell">
+                                        {{@key}}
+                                    </div>
+                                    <div class="tableCell">
+                                        {{this}}
+                                    </div>
+                                </div>
+                                {{/each}}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="tableTitle">
+                                Most significant HTTP error statuses
+                            </div>
+
+                            {{#if stats.requestsWithErrors}}
+                            <div class="table">
+                                <div class="tableHeader">
+                                    <div class="tableHeaderElement">
+                                        HTTP status
+                                    </div>
+                                    <div class="tableHeaderElement">
+                                        Occurrences
+                                    </div>
+                                    <div class="tableHeaderElement">
+                                        Most frequent request
+                                    </div>
+                                </div>
+                                {{#each stats.sortedErrorCodes}}
+                                <div class="tableRow">
+                                    <div class="tableCell">
+                                        {{this}}
+                                    </div>
+                                    {{#with (lookup ../stats.errors this)}}
+                                    <div class="tableCell">
+                                        {{occurrences}}
+                                    </div>
+                                    <div class="tableCell">
+                                        {{topRequest}} ({{topRequestOccurrences}})
+                                    </div>
+                                    {{/with}}
+                                </div>
+                                {{/each}}
+                            </div>
+
+                            {{else}}
+                            <div class="replacementMessage">
+                                No request with errors recorded recently :)
+                            </div>
+                            {{/if}}
+                        </div>
+                        <div>
+                            <div class="tableTitle">
+                                Heaviest responses
+                            </div>
+                            <div class="table">
+                                <div class="tableHeader">
+                                    <div class="tableHeaderElement">
+                                        Bytes
+                                    </div>
+                                    <div class="tableHeaderElement">
+                                        Request
+                                    </div>
+                                </div>
+                                {{#each stats.heaviestResponses}}
+                                <div class="tableRow">
+                                    <div class="tableCell">
+                                        {{this.bytes}}
+                                    </div>
+                                    <div class="tableCell">
+                                        {{this.request}}
+                                    </div>
+                                </div>
+                                {{/each}}
+                            </div>
+                        </div>
+
+                        {{else}}
                         <div class="tableTitle">
-                            Most hit website sections
+                            Stats
                         </div>
-                        <div class="table">
-                            <div class="tableHeader">
-                                <div class="tableHeaderElement">
-                                    Section
-                                </div>
-                                <div class="tableHeaderElement">
-                                    Hits
-                                </div>
-                            </div>
-                            {{#each stats.sectionHits}}
-                            <div class="tableRow">
-                                <div class="tableCell">
-                                    {{@key}}
-                                </div>
-                                <div class="tableCell">
-                                    {{this}}
-                                </div>
-                            </div>
-                            {{/each}}
+                        <div class="replacementMessage">
+                            No request recorded recently
                         </div>
+                        {{/if}}
                     </div>
-                    <div>
+                    <div class="card">
                         <div class="tableTitle">
-                            Most significant HTTP error statuses
+                            Alert history
                         </div>
 
-                        {{#if stats.requestsWithErrors}}
+                        {{#if alerts}}
                         <div class="table">
                             <div class="tableHeader">
-                                <div class="tableHeaderElement">
-                                    HTTP status
-                                </div>
-                                <div class="tableHeaderElement">
-                                    Occurrences
-                                </div>
-                                <div class="tableHeaderElement">
-                                    Most frequent request
-                                </div>
+                                <div class="tableHeaderElement">Time</div>
+                                <div class="tableHeaderElement">Type</div>
                             </div>
-                            {{#each stats.sortedErrorCodes}}
+                            {{#each alerts}}
                             <div class="tableRow">
-                                <div class="tableCell">
-                                    {{this}}
-                                </div>
-                                {{#with (lookup ../stats.errors this)}}
-                                <div class="tableCell">
-                                    {{occurrences}}
-                                </div>
-                                <div class="tableCell">
-                                    {{topRequest}} ({{topRequestOccurrences}})
-                                </div>
-                                {{/with}}
+                                <div class="tableCell">{{this.time}}</div>
+                                <div class="tableCell">{{this.type}}</div>
                             </div>
                             {{/each}}
                         </div>
 
                         {{else}}
                         <div class="replacementMessage">
-                            No request with errors recorded recently :)
+                            No alert recorded :)
                         </div>
                         {{/if}}
                     </div>
-                    <div>
-                        <div class="tableTitle">
-                            Heaviest responses
-                        </div>
-                        <div class="table">
-                            <div class="tableHeader">
-                                <div class="tableHeaderElement">
-                                    Bytes
-                                </div>
-                                <div class="tableHeaderElement">
-                                    Request
-                                </div>
-                            </div>
-                            {{#each stats.heaviestResponses}}
-                            <div class="tableRow">
-                                <div class="tableCell">
-                                    {{this.bytes}}
-                                </div>
-                                <div class="tableCell">
-                                    {{this.request}}
-                                </div>
-                            </div>
-                            {{/each}}
-                        </div>
-                    </div>
-
-                    {{else}}
-                    <div class="tableTitle">
-                        Stats
-                    </div>
-                    <div class="replacementMessage">
-                        No request recorded recently
-                    </div>
-                    {{/if}}
-                </div>
-                <div class="card">
-                    <div class="tableTitle">
-                        Alert history
-                    </div>
-
-                    {{#if alerts}}
-                    <div class="table">
-                        <div class="tableHeader">
-                            <div class="tableHeaderElement">Time</div>
-                            <div class="tableHeaderElement">Type</div>
-                        </div>
-                        {{#each alerts}}
-                        <div class="tableRow">
-                            <div class="tableCell">{{this.time}}</div>
-                            <div class="tableCell">{{this.type}}</div>
-                        </div>
-                        {{/each}}
-                    </div>
-
-                    {{else}}
-                    <div class="replacementMessage">
-                        No alert recorded :)
-                    </div>
-                    {{/if}}
                 </div>
             </div>
         </template>
