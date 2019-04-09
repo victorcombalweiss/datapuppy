@@ -56,10 +56,10 @@ class Alerter {
         }
         Alert result = null;
         if (requestsPerSecond >= trafficThreshold && currentStatus != AlertType.PEAK_TRAFFIC_START) {
-            result = new Alert(AlertType.PEAK_TRAFFIC_START, forTime);
+            result = new Alert(AlertType.PEAK_TRAFFIC_START, forTime, Optional.of(requestCount));
         }
         else if (requestsPerSecond < trafficThreshold && currentStatus == AlertType.PEAK_TRAFFIC_START) {
-            result = new Alert(AlertType.PEAK_TRAFFIC_STOP, forTime);
+            result = new Alert(AlertType.PEAK_TRAFFIC_STOP, forTime, Optional.empty());
         }
         if (result != null) {
             currentStatus = result.type;

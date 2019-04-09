@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.time.Instant;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,8 @@ public class TestAgentHelper {
     @Test
     void testAgentHelper_normalCase_returnCorrectValue() throws IOException {
         Reader input = new StringReader("[{\"type\":\"PEAK_TRAFFIC_START\",\"time\":1554802619069}]");
-        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L));
+        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L),
+                Optional.empty());
 
         String result = new AgentHelper().prependToJsonArray(input, alert);
 
@@ -35,7 +37,8 @@ public class TestAgentHelper {
     @Test
     void testAgentHelper_emptyInput_returnSingletonArray() throws IOException {
         Reader input = new StringReader("");
-        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L));
+        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L),
+                Optional.empty());
 
         String result = new AgentHelper().prependToJsonArray(input, alert);
 
@@ -45,7 +48,8 @@ public class TestAgentHelper {
     @Test
     void testAgentHelper_emptyArray_returnSingletonArray() throws Exception {
         Reader input = new StringReader("[]");
-        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L));
+        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L),
+                Optional.empty());
 
         String result = new AgentHelper().prependToJsonArray(input, alert);
 
@@ -65,7 +69,8 @@ public class TestAgentHelper {
     @Test
     void testAgentHelper_invalidJsonElement_prependNewAlertAsIs() throws IOException {
         Reader input = new StringReader("[invalid]");
-        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L));
+        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L),
+                Optional.empty());
 
         String result = new AgentHelper().prependToJsonArray(input, alert);
 
@@ -80,7 +85,8 @@ public class TestAgentHelper {
     @Test
     void testAgentHelper_inputIsJsonElementButNotArray_returnArray() throws IOException {
         Reader input = new StringReader("{\"key\":\"value\"}");
-        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L));
+        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L),
+                Optional.empty());
 
         String result = new AgentHelper().prependToJsonArray(input, alert);
 
@@ -97,7 +103,8 @@ public class TestAgentHelper {
     @Test
     void testAgentHelper_nullInput_throwException() {
         Reader input = null;
-        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L));
+        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L),
+                Optional.empty());
 
         assertThrows(
                 IllegalArgumentException.class,
@@ -107,7 +114,8 @@ public class TestAgentHelper {
     @Test
     void testAgentHelper_invalidJsonInput_throwException() {
         Reader input = new StringReader("invalid");
-        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L));
+        Alert alert = new Alert(AlertType.PEAK_TRAFFIC_STOP, Instant.ofEpochMilli(1554802920144L),
+                Optional.empty());
 
         assertThrows(
                 IllegalStateException.class,

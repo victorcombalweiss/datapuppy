@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.victorcombalweiss.datapuppy.agent.model.AccessStats;
 import com.github.victorcombalweiss.datapuppy.agent.model.Alert;
+import com.github.victorcombalweiss.datapuppy.agent.model.Alert.AlertType;
 
 public class Agent {
 
@@ -87,7 +88,7 @@ public class Agent {
                 () -> {
                     Optional<Alert> alert = alerter.getNewAlert(Instant.now());
                     if (alert.isPresent()) {
-                        logger.info("Alert triggered");
+                        logAlert(alert.get());
                         String alertHistory;
                         try {
                             try (Reader reader = new BufferedReader(new FileReader(alertFilePath))) {
@@ -111,5 +112,15 @@ public class Agent {
                     }
                 },
                 0, 100, TimeUnit.MILLISECONDS);
+    }
+
+    private static void logAlert(Alert alert) {
+        if (alert.type == AlertType.PEAK_TRAFFIC_START) {
+            logger.info("High traffic generated an alert - hits = " + alert.requestCount.get()
+            + ", triggered at " + alert.time);
+        }
+        else {
+            logger.info("High traffic alert recovered");
+        }
     }
 }
