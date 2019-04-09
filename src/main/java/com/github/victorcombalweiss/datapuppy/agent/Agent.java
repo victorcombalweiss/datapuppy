@@ -1,9 +1,14 @@
 package com.github.victorcombalweiss.datapuppy.agent;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -17,8 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.victorcombalweiss.datapuppy.agent.model.AccessStats;
 import com.github.victorcombalweiss.datapuppy.agent.model.Alert;
 
@@ -63,10 +66,6 @@ public class Agent {
                 true);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
-        objectMapper.configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
-
         Paths.get(statsFilePath).toFile().getParentFile().mkdirs();
 
         Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(
@@ -81,6 +80,7 @@ public class Agent {
                 },
                 0, secondsBetweenChecks, TimeUnit.SECONDS);
 
+        AgentHelper helper = new AgentHelper();
         Paths.get(alertFilePath).toFile().getParentFile().mkdirs();
 
         Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(
@@ -88,9 +88,22 @@ public class Agent {
                     Optional<Alert> alert = alerter.getNewAlert(Instant.now());
                     if (alert.isPresent()) {
                         logger.info("Alert triggered");
+                        String alertHistory;
+                        try {
+                            try (Reader reader = new BufferedReader(new FileReader(alertFilePath))) {
+                                alertHistory = helper.prependToJsonArray(reader, alert.get());
+                            }
+                            catch (FileNotFoundException ex) {
+                                alertHistory = helper.prependToJsonArray(new StringReader("[]"), alert.get());
+                            }
+                        }
+                        catch (IOException ex) {
+                            logger.error("Could not read from alert file", ex);
+                            return;
+                        }
                         try (PrintWriter writer = new PrintWriter(new BufferedWriter(
-                                new FileWriter(alertFilePath, true)))) {
-                            writer.println(objectMapper.writeValueAsString(alert.get()));
+                                new FileWriter(alertFilePath)))) {
+                            writer.write(alertHistory);
                         }
                         catch (IOException ex) {
                             logger.error("Could not write to alert file", ex);

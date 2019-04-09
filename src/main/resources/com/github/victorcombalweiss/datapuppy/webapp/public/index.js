@@ -34,17 +34,20 @@ function refresh() {
 }
 
 function getAlertData() {
-    return getApiData("alerts");
+    return getApiData("alerts", []);
 }
 
 function getStatsData() {
     return getApiData("stats");
 }
 
-function getApiData(subPath) {
+function getApiData(subPath, defaultValue) {
     var request = new XMLHttpRequest();
     request.open("GET", "/api/" + subPath, false);
     request.send(null);
+    if (request.status != 200 && defaultValue) {
+        return defaultValue;
+    }
     return JSON.parse(request.responseText);
 }
 
@@ -61,7 +64,7 @@ function compileData(alertData, statsData) {
 
 function onGoingAlert(alerts) {
     return alerts && alerts.length > 0
-        && alerts[alerts.length - 1].type == PEAK_TRAFFIC_START_ALERT_TYPE;
+        && alerts[0].type == PEAK_TRAFFIC_START_ALERT_TYPE;
 }
 
 function statsPresent(stats) {

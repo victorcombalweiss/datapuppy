@@ -1,28 +1,18 @@
 package com.github.victorcombalweiss.datapuppy.webapp;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.StringJoiner;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.codahale.metrics.annotation.Timed;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 public class ApiResource {
-
-    private static final Logger logger = LoggerFactory.getLogger(ApiResource.class);
 
     private final String alertFilePath;
     private final String statsFilePath;
@@ -35,26 +25,22 @@ public class ApiResource {
     @Path("/alerts")
     @GET
     @Timed
-    public String getAlerts() throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(alertFilePath))) {
-            StringJoiner stringJoiner = new StringJoiner(",", "[", "]");
-            while (reader.ready()) {
-                stringJoiner.add(reader.readLine());
-            }
-            return stringJoiner.toString();
-        } catch (FileNotFoundException ex) {
-            logger.info("Alert file path does not exist");
-            return "[]";
-        } catch (IOException ex) {
-            logger.error("Error occurred while trying to read from alert file", ex);
-            throw ex;
-        }
+    public File getAlerts() {
+        return getFileOrNull(alertFilePath);
     }
 
     @Path("/stats")
     @GET
     @Timed
     public File getStats() {
-        return Paths.get(statsFilePath).toFile();
+        return getFileOrNull(statsFilePath);
+    }
+
+    private File getFileOrNull(String filePath) {
+        File result = Paths.get(filePath).toFile();
+        if (!result.exists()) {
+            return null;
+        }
+        return result;
     }
 }

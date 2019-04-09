@@ -44,7 +44,7 @@ public class Main {
         final Path agentOutputDirectory = Paths
                 .get(System.getProperty("user.home"))
                 .resolve(".datapuppy");
-        final String alertFilePath = agentOutputDirectory.resolve("alerts")
+        final String alertFilePath = agentOutputDirectory.resolve("alerts.json")
                 .toString();
         final String statsFilePath = agentOutputDirectory.resolve("stats.json")
                 .toString();
