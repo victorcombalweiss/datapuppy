@@ -5,7 +5,12 @@
 or to pass arguments by command line:
 
     ./gradlew docker
-    docker run -p 8080:8080 -p 9000:9000 datapuppy --trafficThreshold=15
+    docker run -p 8080:8080 -p 9000:9000 datapuppy --trafficThreshold=15 --logFile=/tmp/other.log
+
+### Command line options
+
+- `-l` / `--logFile`: file path to read logs from. Default `/tmp/access.log`
+- `-t` / `--trafficThreshold`: number of requests per second above which to declare an alert. Default `10`
 
 ## Watching
 

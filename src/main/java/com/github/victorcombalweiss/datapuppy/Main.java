@@ -27,6 +27,14 @@ public class Main {
             defaultValue = "10"
         )
         public int trafficThreshold;
+
+        @Option(
+            name = "logFile",
+            abbrev = 'f',
+            help = "Path of log file to read from",
+            defaultValue = "/tmp/access.log"
+        )
+        public String logFilePath;
     }
 
     public static void main(String[] args) throws Exception {
@@ -40,7 +48,6 @@ public class Main {
                   OptionsParser.HelpVerbosity.LONG));
           return;
         }
-        final String accessLogFilePath = "/tmp/access.log";
         final Path agentOutputDirectory = Paths
                 .get(System.getProperty("user.home"))
                 .resolve(".datapuppy");
@@ -49,8 +56,8 @@ public class Main {
         final String statsFilePath = agentOutputDirectory.resolve("stats.json")
                 .toString();
 
-        TestServer.main(new String[] { accessLogFilePath });
-        Agent.main(new String[] { accessLogFilePath, "" + options.trafficThreshold, alertFilePath,
+        TestServer.main(new String[] { options.logFilePath });
+        Agent.main(new String[] { options.logFilePath, "" + options.trafficThreshold, alertFilePath,
                 statsFilePath });
         WebApplication.main(new String[] { alertFilePath, statsFilePath });
     }
