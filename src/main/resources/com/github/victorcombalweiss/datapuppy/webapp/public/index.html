@@ -16,7 +16,11 @@
 
             {{#if onGoingAlert}}
             <div id="alertBanner">
-                High traffic detected
+                High traffic alert triggered
+                {{formatRelative alerts.[0].time}}
+                ({{formatTime alerts.[0].time day="numeric" month="long" year="numeric"
+                    hour="numeric" minute="numeric" second="numeric"}})
+                by {{alerts.[0].requestCount}} requests
             </div>
             {{/if}}
 
@@ -140,7 +144,14 @@
                                         hour="numeric" minute="numeric" second="numeric"}}
                                     ({{formatRelative this.time}})
                                 </div>
-                                <div class="tableCell">{{formatAlertType this.type}}</div>
+                                <div class="tableCell">
+                                    {{#ifIsAlertStart this.type}}
+                                    High traffic generated an alert, with {{this.requestCount}} requests
+
+                                    {{else}}
+                                    High traffic alert recovered
+                                    {{/ifIsAlertStart}}
+                                </div>
                             </div>
                             {{/each}}
                         </div>

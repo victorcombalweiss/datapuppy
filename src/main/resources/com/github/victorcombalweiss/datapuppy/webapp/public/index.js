@@ -8,15 +8,9 @@ const PEAK_TRAFFIC_STOP_ALERT_TYPE = "PEAK_TRAFFIC_STOP";
 
 HandlebarsIntl.registerWith(Handlebars);
 
-Handlebars.registerHelper("formatAlertType", function(alertType) {
-    switch (alertType) {
-    case PEAK_TRAFFIC_START_ALERT_TYPE:
-        return "High traffic alert triggered";
-    case PEAK_TRAFFIC_STOP_ALERT_TYPE:
-        return "End of high traffic";
-    default:
-        return alertType;
-    }
+Handlebars.registerHelper("ifIsAlertStart", function(alertType, options) {
+    return alertType == PEAK_TRAFFIC_START_ALERT_TYPE
+        ? options.fn(this) : options.inverse(this);
 });
 
 function refresh() {
