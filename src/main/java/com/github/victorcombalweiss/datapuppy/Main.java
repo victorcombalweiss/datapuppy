@@ -62,10 +62,15 @@ public class Main {
         final String statsFilePath = agentOutputDirectory.resolve("stats.json")
                 .toString();
 
+        System.out.println("Loading...");
         TestServer.main(new String[] { options.logFilePath });
         Agent.main(new String[] { options.logFilePath, "" + options.trafficThreshold, alertFilePath,
                 statsFilePath });
         WebApplication.main(new String[] { alertFilePath, statsFilePath });
+
+        System.out.println("Ready!\n\n"
+                + "Watch stats and alerts on port 9000 of this machine (for example http://localhost:9000)\n\n"
+                + "Generate traffic by sending requests to port 8080 of this machine\n\n");
     }
 
     private static void printResource(String resourcePath, PrintStream outputStream) throws IOException {
