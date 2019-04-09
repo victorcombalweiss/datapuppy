@@ -1,5 +1,9 @@
 package com.github.victorcombalweiss.datapuppy;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -48,6 +52,8 @@ public class Main {
                   OptionsParser.HelpVerbosity.LONG));
           return;
         }
+
+        printResource("ascii-logo.txt", System.out);
         final Path agentOutputDirectory = Paths
                 .get(System.getProperty("user.home"))
                 .resolve(".datapuppy");
@@ -60,5 +66,15 @@ public class Main {
         Agent.main(new String[] { options.logFilePath, "" + options.trafficThreshold, alertFilePath,
                 statsFilePath });
         WebApplication.main(new String[] { alertFilePath, statsFilePath });
+    }
+
+    private static void printResource(String resourcePath, PrintStream outputStream) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                Thread.currentThread().getContextClassLoader().getResourceAsStream(
+                        Main.class.getPackage().getName().replaceAll("\\.", "/") + "/" + resourcePath)))) {
+            while (reader.ready()) {
+                outputStream.println(reader.readLine());
+            }
+        }
     }
 }
