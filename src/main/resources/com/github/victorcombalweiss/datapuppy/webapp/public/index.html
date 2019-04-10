@@ -44,7 +44,7 @@
                                 </div>
                                 {{#each stats.sectionHits}}
                                 <div class="tableRow">
-                                    <div class="tableCell">
+                                    <div class="tableCell code">
                                         {{@key}}
                                     </div>
                                     <div class="tableCell">
@@ -74,7 +74,7 @@
                                 </div>
                                 {{#each stats.sortedErrorCodes}}
                                 <div class="tableRow">
-                                    <div class="tableCell">
+                                    <div class="tableCell code">
                                         {{this}}
                                     </div>
                                     {{#with (lookup ../stats.errors this)}}
@@ -82,7 +82,8 @@
                                         {{occurrences}}
                                     </div>
                                     <div class="tableCell">
-                                        {{topRequest}} ({{topRequestOccurrences}})
+                                        <span class="code">{{topRequest}}</span>
+                                        ({{topRequestOccurrences}})
                                     </div>
                                     {{/with}}
                                 </div>
@@ -102,7 +103,7 @@
                             <div class="table">
                                 {{#each stats.heaviestResponses}}
                                 <div class="tableRow">
-                                    <div class="tableCell">
+                                    <div class="tableCell code">
                                         {{this.request}}
                                     </div>
                                     <div class="tableCell responseWeight">

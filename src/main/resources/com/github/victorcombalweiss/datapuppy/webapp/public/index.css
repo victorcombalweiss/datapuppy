@@ -89,6 +89,10 @@ body {
     border-right: 0;
 }
 
+.code {
+    font-family: monospace;
+}
+
 .alertTime {
     width: 50%;
 }
