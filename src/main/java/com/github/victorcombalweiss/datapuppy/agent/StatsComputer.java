@@ -42,7 +42,7 @@ class StatsComputer {
 
     private final Parser<AccessLog> accessLogParser = new HttpdLoglineParser<>(AccessLog.class, LOG_FORMATS);
 
-    void ingestLog(String rawAccessLog) {
+    synchronized void ingestLog(String rawAccessLog) {
         if (rawAccessLog == null) {
             logger.error("Null passed as access log to " + StatsComputer.class.getName());
             return;
@@ -118,7 +118,7 @@ class StatsComputer {
         }
     }
 
-    AccessStats getStatsAndReset() {
+    synchronized AccessStats getStatsAndReset() {
         AccessStats stats = getStats();
         reset();
         return stats;

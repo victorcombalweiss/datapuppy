@@ -31,11 +31,11 @@ class Alerter {
         this.startTime = startTime;
     }
 
-    void ingestLog(String requestLog, Instant logTime) {
+    synchronized void ingestLog(String requestLog, Instant logTime) {
         logDates.add(logTime);
     }
 
-    Optional<Alert> getNewAlert(Instant forTime) {
+    synchronized Optional<Alert> getNewAlert(Instant forTime) {
         if (forTime == null) {
             throw new IllegalArgumentException("Null passed as time for which to check for alerts");
         }
