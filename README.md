@@ -1,3 +1,9 @@
+<p align="center">
+    <img src="https://github.com/victorcombalweiss/datapuppy/raw/master/src/main/resources/com/github/victorcombalweiss/datapuppy/logo-blue.jpg" width=300 align=middle/>
+</p>
+
+# Datapuppy
+
 ## Running
 
     ./gradlew dockerRemoveContainer dockerRun
