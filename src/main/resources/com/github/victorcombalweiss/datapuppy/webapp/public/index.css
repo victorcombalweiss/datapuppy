@@ -90,6 +90,10 @@ body {
     border-bottom: 0;
 }
 
+.tableHeaderElement {
+    background-color: #c9f0ff4d;
+}
+
 .tableHeaderElement, .tableCell {
     display: table-cell;
     border: 1px solid #c9f0ff;
