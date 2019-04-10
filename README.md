@@ -4,6 +4,11 @@
 
 # Datapuppy
 
+## Requirements
+
+- Java 8
+- Docker
+
 ## Running
 
     ./gradlew dockerRemoveContainer dockerRun
