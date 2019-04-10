@@ -5,7 +5,8 @@ plugins {
     id "com.palantir.docker" version "0.21.0"
     id "com.palantir.docker-run" version "0.21.0"
 }
-
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 mainClassName = "com.github.victorcombalweiss.datapuppy.Main"
 
 repositories {
