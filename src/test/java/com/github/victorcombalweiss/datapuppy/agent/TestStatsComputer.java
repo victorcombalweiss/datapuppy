@@ -76,6 +76,36 @@ public class TestStatsComputer {
     }
 
     @Test
+    void testStatsComputer_normalCaseMoreThanFiveSections_trimSectionHits() {
+        StatsComputer statsComputer = new StatsComputer();
+        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET /1/report HTTP/1.0\" 404 123");
+        statsComputer.ingestLog("127.0.0.1 - jill [09/May/2018:16:00:41 +0000] \"GET /2/user HTTP/1.0\" 404 234");
+        statsComputer.ingestLog("127.0.0.1 - frank [09/May/2018:16:00:42 +0000] \"POST /3/user HTTP/1.0\" 500 34");
+        statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /4/user HTTP/1.0\" 503 12");
+        statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /5/again HTTP/1.0\" 503 11");
+        statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /6/once HTTP/1.0\" 503 11");
+
+        AccessStats result = statsComputer.getStatsAndReset();
+
+        assertEquals(5, result.sectionHits.size());
+    }
+
+    @Test
+    void testStatsComputer_normalCaseMoreThanFiveErrorStatuses_trimErrors() {
+        StatsComputer statsComputer = new StatsComputer();
+        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET /report HTTP/1.0\" 400 123");
+        statsComputer.ingestLog("127.0.0.1 - jill [09/May/2018:16:00:41 +0000] \"GET /api/user HTTP/1.0\" 401 234");
+        statsComputer.ingestLog("127.0.0.1 - frank [09/May/2018:16:00:42 +0000] \"POST /api/user HTTP/1.0\" 500 34");
+        statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /api/user HTTP/1.0\" 501 12");
+        statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /me/again HTTP/1.0\" 502 11");
+        statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /more HTTP/1.0\" 503 11");
+
+        AccessStats result = statsComputer.getStatsAndReset();
+
+        assertEquals(5, result.errors.size());
+    }
+
+    @Test
     void testStatsComputer_normalCaseMoreThanFiveRequests_trimHeaviestResponses() {
         StatsComputer statsComputer = new StatsComputer();
         statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET /report HTTP/1.0\" 404 123");

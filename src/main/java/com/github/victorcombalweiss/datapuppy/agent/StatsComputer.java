@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.NavigableSet;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -35,7 +35,7 @@ class StatsComputer {
     private static final int MAX_ELEMENT_COUNT_IN_LISTS = 5;
 
     private final Map<String, Integer> sectionHits = new HashMap<>();
-    private final SortedMap<Integer, StatsOfARequestCategory> errorStats =
+    private final NavigableMap<Integer, StatsOfARequestCategory> errorStats =
             new TreeMap<>(Collections.reverseOrder());
     private final Map<String, Integer> singleRequestOccurrences = new HashMap<>();
     private final NavigableSet<RequestWithWeight> requestsOrderedByWeight = new TreeSet<>();
@@ -105,6 +105,9 @@ class StatsComputer {
                 errorCodeOccurrences,
                 topRequest,
                 topRequestOccurrences));
+        while (errorStats.size() > MAX_ELEMENT_COUNT_IN_LISTS) {
+            errorStats.pollLastEntry();
+        }
     }
 
     private void updateRequestsOrderedByWeight(AccessLog accessLog, String rawAccessLog) {
@@ -133,6 +136,7 @@ class StatsComputer {
                     }
                     return 1;
                 })
+                .limit(MAX_ELEMENT_COUNT_IN_LISTS)
                 .collect(LinkedHashMap::new,
                         (map, entry) -> map.put(entry.getKey(), entry.getValue()),
                         Map::putAll);
