@@ -59,8 +59,10 @@ body {
 
 .tableTitle {
     padding: 10px;
-    border: 1px solid grey;
+    border: 1px solid #c9f0ff;
     border-bottom: 0;
+    border-radius: 5px 5px 0px 0px;
+    background-color: #c9f0ff;
 }
 
 .table {
@@ -79,7 +81,7 @@ body {
 
 .tableHeaderElement, .tableCell {
     display: table-cell;
-    border: 1px solid grey;
+    border: 1px solid #c9f0ff;
     padding: 10px;
 }
 
@@ -94,5 +96,5 @@ body {
 .replacementMessage {
     text-align: center;
     padding: 100px 0;
-    border: 1px solid grey;
+    border: 1px solid #c9f0ff;
 }
