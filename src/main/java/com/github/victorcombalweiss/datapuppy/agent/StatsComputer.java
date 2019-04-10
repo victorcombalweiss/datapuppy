@@ -74,7 +74,7 @@ class StatsComputer {
         int indexOfStartOfSection = request.charAt(0) == '/' ? 1 : 0;
         int indexOfSlash = request.indexOf('/', indexOfStartOfSection);
         if (indexOfSlash < 0) {
-            return request;
+            return "/";
         }
         return request.substring(0, indexOfSlash);
     }

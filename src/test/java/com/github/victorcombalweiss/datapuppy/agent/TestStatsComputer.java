@@ -17,7 +17,7 @@ public class TestStatsComputer {
     @Test
     void testStatsComputer_normalCase_returnCorrectStats() {
         StatsComputer statsComputer = new StatsComputer();
-        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET /report HTTP/1.0\" 200 123");
+        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET /report/ HTTP/1.0\" 200 123");
         statsComputer.ingestLog("127.0.0.1 - jill [09/May/2018:16:00:41 +0000] \"GET /api/user HTTP/1.0\" 200 234");
         statsComputer.ingestLog("127.0.0.1 - frank [09/May/2018:16:00:42 +0000] \"POST /api/user HTTP/1.0\" 200 34");
         statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /api/user HTTP/1.0\" 303 12");
@@ -33,7 +33,7 @@ public class TestStatsComputer {
                                 new RequestWithWeight(234, "127.0.0.1 - jill [09/May/2018:16:00:41 +0000] "
                                         + "\"GET /api/user HTTP/1.0\" 200 234"),
                                 new RequestWithWeight(123, "127.0.0.1 - james [09/May/2018:16:00:39 +0000] "
-                                        + "\"GET /report HTTP/1.0\" 200 123"),
+                                        + "\"GET /report/ HTTP/1.0\" 200 123"),
                                 new RequestWithWeight(34, "127.0.0.1 - frank [09/May/2018:16:00:42 +0000] "
                                         + "\"POST /api/user HTTP/1.0\" 200 34"),
                                 new RequestWithWeight(12, "127.0.0.1 - mary [09/May/2018:16:00:42 +0000] "
@@ -45,7 +45,7 @@ public class TestStatsComputer {
     @Test
     void testStatsComputer_normalCase_returnAlphabeticalOrderInSectionHitsWhenTie() {
         StatsComputer statsComputer = new StatsComputer();
-        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET /pear HTTP/1.0\" 200 123");
+        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET /pear/ HTTP/1.0\" 200 123");
         statsComputer.ingestLog("127.0.0.1 - jill [09/May/2018:16:00:41 +0000] \"GET /banana/pork HTTP/1.0\" 200 234");
         statsComputer.ingestLog("127.0.0.1 - frank [09/May/2018:16:00:42 +0000] \"POST /pear/lamb HTTP/1.0\" 200 34");
         statsComputer.ingestLog("127.0.0.1 - mary [09/May/2018:16:00:42 +0000] \"POST /banana/chicken HTTP/1.0\" 503 12");
@@ -153,6 +153,30 @@ public class TestStatsComputer {
         AccessStats result = statsComputer.getStatsAndReset();
 
         assertEquals(ImmutableMap.of("/banana", 1), result.sectionHits);
+    }
+
+    @Test
+    void testStatsComputer_rootSectionWithFile_considerAsRootSection() {
+        StatsComputer statsComputer = new StatsComputer();
+        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET /banana HTTP/1.0\" 200 123");
+
+        AccessStats result = statsComputer.getStatsAndReset();
+
+        assertEquals(
+                ImmutableMap.of("/", 1),
+                result.sectionHits);
+    }
+
+    @Test
+    void testStatsComputer_rootSectionWithFileWithoutLeadingSlash_considerAsRootSection() {
+        StatsComputer statsComputer = new StatsComputer();
+        statsComputer.ingestLog("127.0.0.1 - james [09/May/2018:16:00:39 +0000] \"GET banana HTTP/1.0\" 200 123");
+
+        AccessStats result = statsComputer.getStatsAndReset();
+
+        assertEquals(
+                ImmutableMap.of("/", 1),
+                result.sectionHits);
     }
 
     @Test
