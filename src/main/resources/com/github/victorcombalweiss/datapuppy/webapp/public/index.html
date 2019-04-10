@@ -100,21 +100,13 @@
                                 Heaviest responses
                             </div>
                             <div class="table">
-                                <div class="tableHeader">
-                                    <div class="tableHeaderElement">
-                                        Bytes
-                                    </div>
-                                    <div class="tableHeaderElement">
-                                        Request
-                                    </div>
-                                </div>
                                 {{#each stats.heaviestResponses}}
                                 <div class="tableRow">
                                     <div class="tableCell">
-                                        {{this.bytes}}
-                                    </div>
-                                    <div class="tableCell">
                                         {{this.request}}
+                                    </div>
+                                    <div class="tableCell responseWeight">
+                                        {{formatFileSize this.bytes}}
                                     </div>
                                 </div>
                                 {{/each}}

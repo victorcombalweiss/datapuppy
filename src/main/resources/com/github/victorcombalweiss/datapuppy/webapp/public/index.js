@@ -13,6 +13,19 @@ Handlebars.registerHelper("ifIsAlertStart", function(alertType, options) {
         ? options.fn(this) : options.inverse(this);
 });
 
+Handlebars.registerHelper("formatFileSize", function(value) {
+    if (typeof value === 'undefined') {
+      return null;
+    }
+    for (const unit of ["B", "kB", "MB", "GB", "TB"]) {
+      if (value < 1024) {
+        return Math.floor(value) + " " + unit;
+      }
+      value /= 1024;
+    }
+    return filesize;
+});
+
 function refresh() {
     try {
         var alertData = getAlertData();

@@ -93,6 +93,13 @@ body {
     width: 50%;
 }
 
+.responseWeight {
+    white-space: nowrap;
+    text-align: right;
+    border-left: 0;
+    font-weight: bold;
+}
+
 .replacementMessage {
     text-align: center;
     padding: 100px 0;
