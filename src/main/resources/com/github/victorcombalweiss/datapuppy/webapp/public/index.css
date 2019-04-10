@@ -60,11 +60,11 @@ body {
 .tableTitle {
     padding: 10px;
     border: 1px solid grey;
+    border-bottom: 0;
 }
 
 .table {
     display: table;
-    border-collapse: collapse;
     width: 100%;
     margin-bottom: 20px;
 }
@@ -73,10 +73,18 @@ body {
     display: table-row;
 }
 
+.tableRow:not(:last-child) .tableCell, .tableHeader .tableHeaderElement{
+    border-bottom: 0;
+}
+
 .tableHeaderElement, .tableCell {
     display: table-cell;
     border: 1px solid grey;
     padding: 10px;
+}
+
+.tableHeaderElement:not(:last-child), .tableCell:not(:last-child) {
+    border-right: 0;
 }
 
 .alertTime {
@@ -84,7 +92,6 @@ body {
 }
 
 .replacementMessage {
-    width: 100%;
     text-align: center;
     padding: 100px 0;
     border: 1px solid grey;
