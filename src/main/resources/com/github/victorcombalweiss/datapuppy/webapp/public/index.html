@@ -31,7 +31,7 @@
                         {{#if statsPresent }}
                         <div class="halfWidthSubcard">
                             <div class="tableTitle">
-                                Most hit website sections
+                                📊 Most hit website sections
                             </div>
                             <div class="table">
                                 {{#each stats.sectionHits}}
@@ -48,7 +48,7 @@
                         </div>
                         <div class="halfWidthSubcard">
                             <div class="tableTitle">
-                                Most significant HTTP error statuses
+                                ⚠️ Most significant HTTP error statuses
                             </div>
 
                             {{#if stats.requestsWithErrors}}
@@ -90,7 +90,7 @@
                         </div>
                         <div>
                             <div class="tableTitle">
-                                Heaviest responses
+                                ⚖️ Heaviest responses
                             </div>
                             <div class="table">
                                 {{#each stats.heaviestResponses}}
@@ -108,7 +108,7 @@
 
                         {{else}}
                         <div class="tableTitle">
-                            Stats
+                            📈 Stats
                         </div>
                         <div class="replacementMessage">
                             No request recorded recently
@@ -117,7 +117,7 @@
                     </div>
                     <div class="card">
                         <div class="tableTitle">
-                            Alert history
+                            📖 Alert history
                         </div>
 
                         {{#if alerts}}
@@ -125,6 +125,11 @@
                             {{#each alerts}}
                             <div class="tableRow">
                                 <div class="tableCell alertTime">
+                                    {{#ifIsAlertStart this.type}}
+                                    🔴
+                                    {{else}}
+                                    ✅
+                                    {{/ifIsAlertStart}}
                                     {{formatTime this.time day="numeric" month="long" year="numeric"
                                         hour="numeric" minute="numeric" second="numeric"}}
                                     ({{formatRelative this.time}})
