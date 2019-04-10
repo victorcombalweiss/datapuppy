@@ -30,3 +30,9 @@ Example: `http://192.168.99.100:8080/banana`
 ## Running automated tests
 
     ./gradlew test
+
+## Known issues
+
+If running inside a Docker container and reading from a log file on host machine, container's
+clock has to be in sync with host machine, otherwise access log file might be read again in
+whole every second, or conversely never read.
