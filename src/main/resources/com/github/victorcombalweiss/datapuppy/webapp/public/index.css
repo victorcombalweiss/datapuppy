@@ -57,6 +57,17 @@ body {
     margin-bottom: 20px;
 }
 
+.halfWidthSubcard {
+    display: inline-block;
+    width: calc(50% - 10px);
+    padding-right: 8px;
+}
+
+.halfWidthSubcard + .halfWidthSubcard {
+    padding-right: 0;
+    padding-left: 8px;
+}
+
 .tableTitle {
     padding: 10px;
     border: 1px solid #c9f0ff;
