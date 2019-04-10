@@ -34,21 +34,13 @@
                                 Most hit website sections
                             </div>
                             <div class="table">
-                                <div class="tableHeader">
-                                    <div class="tableHeaderElement">
-                                        Section
-                                    </div>
-                                    <div class="tableHeaderElement">
-                                        Hits
-                                    </div>
-                                </div>
                                 {{#each stats.sectionHits}}
                                 <div class="tableRow">
                                     <div class="tableCell code">
                                         {{@key}}
                                     </div>
                                     <div class="tableCell">
-                                        {{this}}
+                                        {{this}} {{pluralize this "hit"}}
                                     </div>
                                 </div>
                                 {{/each}}

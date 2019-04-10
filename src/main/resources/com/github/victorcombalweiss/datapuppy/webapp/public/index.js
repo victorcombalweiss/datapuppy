@@ -26,6 +26,13 @@ Handlebars.registerHelper("formatFileSize", function(value) {
     return filesize;
 });
 
+Handlebars.registerHelper('pluralize', function(number, singular, plural) {
+    if (number === 1)
+        return singular;
+    else
+        return (typeof plural === 'string' ? plural : singular + 's');
+});
+
 function refresh() {
     try {
         var alertData = getAlertData();
