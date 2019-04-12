@@ -50,7 +50,7 @@ public class Agent {
         final String alertFilePath = args[2];
         final String statsFilePath = args[3];
 
-        StatsComputer statsComputer = new StatsComputer();
+        StatsComputer statsComputer = new StatsComputer(Instant.now());
         Alerter alerter = new Alerter(trafficThreshold, Instant.now());
 
         Tailer.create(
@@ -71,7 +71,7 @@ public class Agent {
 
         Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(
                 () -> {
-                    AccessStats stats = statsComputer.getStatsAndReset();
+                    AccessStats stats = statsComputer.getStatsAndReset(Instant.now());
                     logger.info("Stats: " + stats);
                     try (Writer writer = new FileWriter(statsFilePath)) {
                         objectMapper.writeValue(writer, stats);

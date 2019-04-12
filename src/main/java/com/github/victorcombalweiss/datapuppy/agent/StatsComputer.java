@@ -1,12 +1,16 @@
 package com.github.victorcombalweiss.datapuppy.agent;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -18,6 +22,8 @@ import com.github.victorcombalweiss.datapuppy.agent.model.AccessLog;
 import com.github.victorcombalweiss.datapuppy.agent.model.AccessStats;
 import com.github.victorcombalweiss.datapuppy.agent.model.RequestWithWeight;
 import com.github.victorcombalweiss.datapuppy.agent.model.StatsOfARequestCategory;
+import com.github.victorcombalweiss.datapuppy.agent.model.SummaryStats;
+import com.github.victorcombalweiss.datapuppy.agent.model.SummaryStats.ErrorPercentages;
 import com.google.common.base.Strings;
 
 import nl.basjes.parse.core.Parser;
@@ -34,6 +40,13 @@ class StatsComputer {
             + "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" %T";
     private static final int MAX_ELEMENT_COUNT_IN_LISTS = 5;
 
+    private Instant timeIntervalStart;
+    private int requestCount = 0;
+    private int clientErrorCount = 0;
+    private int serverErrorCount = 0;
+
+    private final Set<String> uniqueIps = new HashSet<>();
+    private final List<Integer> responseWeights = new ArrayList<>();
     private final Map<String, Integer> sectionHits = new HashMap<>();
     private final NavigableMap<Integer, StatsOfARequestCategory> errorStats =
             new TreeMap<>(Collections.reverseOrder());
@@ -42,6 +55,13 @@ class StatsComputer {
 
     private final Parser<AccessLog> accessLogParser = new HttpdLoglineParser<>(AccessLog.class, LOG_FORMATS);
 
+    StatsComputer(Instant startTime) {
+        if (startTime == null) {
+            throw new IllegalArgumentException("Null passed as start time to " + StatsComputer.class.getName());
+        }
+        timeIntervalStart = startTime;
+    }
+
     synchronized void ingestLog(String rawAccessLog) {
         if (rawAccessLog == null) {
             logger.error("Null passed as access log to " + StatsComputer.class.getName());
@@ -49,12 +69,25 @@ class StatsComputer {
         }
         try {
             AccessLog accessLog = accessLogParser.parse(rawAccessLog);
+            updateSummaryData(accessLog);
             updateSectionHits(accessLog);
             updateErrorStats(accessLog);
             updateRequestsOrderedByWeight(accessLog, rawAccessLog);
         } catch (DissectionFailure | InvalidDissectorException | MissingDissectorsException ex) {
             logger.error("Failed parsing access log line. Skipping it: '" + rawAccessLog + "'",
                     ex);
+        }
+    }
+
+    private void updateSummaryData(AccessLog accessLog) {
+        requestCount++;
+        uniqueIps.add(accessLog.getClientIp());
+        responseWeights.add(accessLog.getResponseWeight());
+        if (HttpStatus.isClientError(accessLog.getHttpStatus())) {
+            clientErrorCount++;
+        }
+        else if (HttpStatus.isServerError(accessLog.getHttpStatus())) {
+            serverErrorCount++;
         }
     }
 
@@ -118,13 +151,33 @@ class StatsComputer {
         }
     }
 
-    synchronized AccessStats getStatsAndReset() {
-        AccessStats stats = getStats();
-        reset();
+    synchronized AccessStats getStatsAndReset(Instant forTime) {
+        AccessStats stats = getStats(forTime);
+        reset(forTime);
         return stats;
     }
 
-    private AccessStats getStats() {
+    private AccessStats getStats(Instant forTime) {
+        if (forTime == null) {
+            throw new IllegalArgumentException("Null passed as poll time to get stats");
+        }
+        long timeInterval = forTime.toEpochMilli() - timeIntervalStart.toEpochMilli();
+        if (timeInterval < 0) {
+            throw new IllegalArgumentException("Polling stats at time prior to last poll");
+        }
+        if (timeInterval == 0) {
+            timeInterval = 1;
+        }
+        double requestsPerSecond = 1000.0 * requestCount / timeInterval;
+        double requestsPerIp = requestCount == 0 ? 0 : requestCount / uniqueIps.size();
+        Collections.sort(responseWeights);
+        int medianWeight = responseWeights.isEmpty() ? 0 : responseWeights.get((responseWeights.size() -1) / 2);
+        ErrorPercentages errorPercentages = requestCount == 0
+                ? new ErrorPercentages(0, 0)
+                : new ErrorPercentages(
+                        (double)clientErrorCount / requestCount,
+                        (double)serverErrorCount / requestCount);
+
         Map<String, Integer> orderedSectionHits = sectionHits.entrySet()
                 .stream()
                 .sorted((entry1, entry2) -> {
@@ -140,10 +193,19 @@ class StatsComputer {
                 .collect(LinkedHashMap::new,
                         (map, entry) -> map.put(entry.getKey(), entry.getValue()),
                         Map::putAll);
-        return new AccessStats(orderedSectionHits, errorStats, new ArrayList<>(requestsOrderedByWeight));
+
+        return new AccessStats(
+                new SummaryStats(requestsPerSecond, requestsPerIp, medianWeight, errorPercentages),
+                orderedSectionHits, errorStats, new ArrayList<>(requestsOrderedByWeight));
     }
 
-    private void reset() {
+    private void reset(Instant timeIntervalStart) {
+        this.timeIntervalStart = timeIntervalStart;
+        requestCount = 0;
+        clientErrorCount = 0;
+        serverErrorCount = 0;
+        uniqueIps.clear();
+        responseWeights.clear();
         sectionHits.clear();
         errorStats.clear();
         singleRequestOccurrences.clear();

@@ -6,10 +6,20 @@ import nl.basjes.parse.core.Field;
 
 public class AccessLog {
 
+    private String clientIp;
     private HttpMethod httpMethod;
     private String request;
     private int httpStatus;
     private int responseWeight;
+
+    @Field("IP:connection.client.host")
+    public void setClientIp(final String clientIp) {
+        this.clientIp = clientIp;
+    }
+
+    public String getClientIp() {
+        return clientIp;
+    }
 
     @Field("HTTP.PATH:request.firstline.uri.path")
     public void setRequest(final String request) {
