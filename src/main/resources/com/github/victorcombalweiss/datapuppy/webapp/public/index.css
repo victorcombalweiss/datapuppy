@@ -105,6 +105,20 @@ body {
     border-right: 0;
 }
 
+.tableCell.merged + .tableCell {
+    border-left: 0;
+}
+
+.tableCell.merged {
+    white-space: nowrap;
+    width: 1;
+    padding-right: 0;
+}
+
+.inlineValue {
+    font-weight: bold;
+}
+
 .code {
     font-family: monospace;
 }

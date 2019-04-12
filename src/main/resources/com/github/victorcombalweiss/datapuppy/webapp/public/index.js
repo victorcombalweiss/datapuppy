@@ -111,6 +111,7 @@ function render(data) {
     if (mainBodyWrapper) {
         mainBodyWrapper.scrollTo(left, top);
     }
+    setSummaryStatsColumnSizes();
 }
 
 function getMainBodyWrapper() {
@@ -118,3 +119,29 @@ function getMainBodyWrapper() {
 }
 
 refresh();
+
+/********************* Display-specific logic *********************/
+
+function setSummaryStatsColumnSizes() {
+    const cellsToResize = document.querySelectorAll(".summaryStats .tableCell:first-child + .tableCell");
+    for (const cell of cellsToResize) {
+        const siblingWidth = cell.previousElementSibling.clientWidth;
+        const parentWidth = cell.parentElement.clientWidth;
+        const horizontalPadding = getComputedHorizontalPadding(cell);
+        cell.style.width = parentWidth / 2 - siblingWidth - horizontalPadding;
+    }
+}
+
+function getComputedHorizontalPadding(element) {
+    const computedStyle = window.getComputedStyle(element);
+    const paddingLeft = computedStyle.getPropertyValue("padding-left");
+    const paddingRight = computedStyle.getPropertyValue("padding-right");
+    return pixelStringToInt(paddingLeft)
+        + pixelStringToInt(paddingRight);
+}
+
+function pixelStringToInt(pixelString) {
+    return parseInt(pixelString.substr(0, pixelString.length - 2));
+}
+
+window.onresize = setSummaryStatsColumnSizes;

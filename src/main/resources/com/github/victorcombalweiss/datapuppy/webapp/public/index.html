@@ -29,6 +29,57 @@
                     <div class="card">
 
                         {{#if statsPresent }}
+                        <div>
+                            <div class="tableTitle">
+                                ⏱️ Summary
+                            </div>
+                            <div class="table summaryStats">
+                                <div class="tableRow">
+                                    <div class="tableCell merged inlineValue">
+                                        {{formatNumber stats.summary.requestsPerSecond maximumFractionDigits=2}}
+                                    </div>
+                                    <div class="tableCell">
+                                        requests per second on average
+                                    </div>
+                                    <div class="tableCell merged inlineValue">
+                                        {{#if stats.summary.errorPercentages.clientErrors}}
+                                        {{formatNumber stats.summary.errorPercentages.clientErrors
+                                            style="percent" maximumFractionDigits=0}}
+
+                                        {{else}}
+                                        No
+                                        {{/if}}
+                                        <br>
+                                        {{#if stats.summary.errorPercentages.serverErrors}}
+                                        {{formatNumber stats.summary.errorPercentages.serverErrors
+                                            style="percent" maximumFractionDigits=0}}
+
+                                        {{else}}
+                                        No
+                                        {{/if}}
+                                    </div>
+                                    <div class="tableCell">
+                                        client error statuses
+                                        <br>
+                                        server error statuses
+                                    </div>
+                                </div>
+                                <div class="tableRow">
+                                    <div class="tableCell merged inlineValue">
+                                        {{formatNumber stats.summary.requestsPerIp maximumFractionDigits=2}}
+                                    </div>
+                                    <div class="tableCell">
+                                        requests per IP on average
+                                    </div>
+                                    <div class="tableCell merged inlineValue">
+                                        {{formatFileSize stats.summary.medianResponseSize}}
+                                    </div>
+                                    <div class="tableCell">
+                                        median response size
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="halfWidthSubcard">
                             <div class="tableTitle">
                                 📊 Most hit website sections
